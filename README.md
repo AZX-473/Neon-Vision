@@ -41,4 +41,4 @@ cmake --build build --config Release
 ```
 
 ## 安装
-### [请跳转至realease页面下载最新的安装包](./release)
+### [请跳转至realease页面下载最新的安装包](https://github.com/AZX-473/Neon-Vision/release)
