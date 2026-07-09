@@ -1,0 +1,15 @@
+{
+  "name": "neonvision",
+  "version": "1.0.0",
+  "description": "A transparent window application built with Dear ImGui, GLFW, and OpenGL.",
+  "dependencies": [
+    {
+      "name": "imgui",
+      "features": [
+        "glfw-binding",
+        "opengl3-binding"
+      ]
+    },
+    "glfw3"
+  ]
+}

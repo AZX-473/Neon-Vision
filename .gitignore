@@ -1,0 +1,32 @@
+# 构建目录
+build/
+out/
+cmake-build-*/
+
+# vcpkg 本地缓存（保留 vcpkg.json）
+vcpkg_installed/
+vcpkg-manifest-install.log
+
+# IDE 文件
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# 编译输出
+*.exe
+*.pdb
+*.ilk
+*.obj
+*.lib
+*.dll
+*.so
+*.dylib
+
+# 日志
+*.log
