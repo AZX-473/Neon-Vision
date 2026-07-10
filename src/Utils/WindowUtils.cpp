@@ -1,6 +1,7 @@
 #include "WindowUtils.h"
 #include <dwmapi.h>
 #include <iostream>
+#include "../PublicVariable/Variable.h"
 
 #pragma comment(lib, "dwmapi.lib")
 
@@ -205,11 +206,15 @@ void WindowUtils::GetClientSize(HWND hwnd, int& width, int& height) {
 }
 
 std::string WindowUtils::GetWindowTitle(HWND hwnd) {
+    // Do not return our own application's window title to avoid self-display
+    if (hwnd == NULL) return std::string();
+    if (hwnd == hWnd) return std::string();
+
     wchar_t buffer[256];
     GetWindowTextW(hwnd, buffer, 256);
 
     int len = WideCharToMultiByte(CP_UTF8, 0, buffer, -1, NULL, 0, NULL, NULL);
-    if (len <= 0) return "";
+    if (len <= 0) return std::string();
 
     std::string result(len - 1, 0);
     WideCharToMultiByte(CP_UTF8, 0, buffer, -1, &result[0], len, NULL, NULL);
@@ -238,7 +243,32 @@ void WindowUtils::SetWindowTitleW(HWND hwnd, const std::wstring& title) {
 HWND WindowUtils::GetWindowUnderCursor() {
     POINT pt;
     GetCursorPos(&pt);
-    return WindowFromPoint(pt);
+    HWND hwnd = WindowFromPoint(pt);
+    // If the topmost window (or its top-level ancestor) is our own overlay, find the next visible window beneath it
+    HWND topLevel = hwnd ? GetAncestor(hwnd, GA_ROOT) : NULL;
+    // Treat any window that belongs to our process as 'our window' (covers child/controls)
+    DWORD wndPid = 0;
+    if (hwnd) GetWindowThreadProcessId(hwnd, &wndPid);
+    bool isOurWindow = (hwnd == hWnd) || (topLevel == hWnd) || (wndPid == GetCurrentProcessId());
+    if (isOurWindow) {
+        // Iterate top-level windows in Z order (topmost first)
+        for (HWND cur = GetTopWindow(NULL); cur != NULL; cur = GetNextWindow(cur, GW_HWNDNEXT)) {
+            if (cur == hWnd) continue;
+            if (!IsWindowVisible(cur)) continue;
+            // skip windows that belong to our process
+            DWORD curPid = 0;
+            GetWindowThreadProcessId(cur, &curPid);
+            if (curPid == GetCurrentProcessId()) continue;
+            RECT r;
+            if (!::GetWindowRect(cur, &r)) continue;
+            if (PtInRect(&r, pt)) {
+                return cur;
+            }
+        }
+        // fallback: return desktop window
+        return GetDesktopWindow();
+    }
+    return hwnd;
 }
 
 HWND WindowUtils::GetWindowUnderCursorEx() {

@@ -33,6 +33,9 @@ private:
     #define Tab_Vision 1
     #define Tab_Mode 2
     #define Tab_Surveillance 3
+    #define Tab_SC_WindowRECT 4
+    #define Tab_SC_PointerLine 5
+    #define Tab_SC_WindowName 6
 	int Tab = Tab_Home;  // 当前选中的标签页
 
     void DrawMENU();
@@ -40,5 +43,7 @@ private:
 	void DrawTab_VisionMain();
 	void DrawTab_ModeMain();
 	void DrawTab_SurveillanceMain();
-
+    void DrawTab_SC_WindowRECTMain();
+    void DrawTab_SC_PointerLineMain();
+    void DrawTab_SC_WindowNameMain();
 };

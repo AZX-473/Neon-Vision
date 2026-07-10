@@ -8,6 +8,8 @@ if(MSVC)
     add_compile_options("/utf-8")
     # Disable MSVC secure CRT warnings like deprecated localtime
     add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+    # Reduce Windows.h macro pollution and avoid min/max macro conflicts
+    add_compile_definitions(WIN32_LEAN_AND_MEAN NOMINMAX)
 endif()
 
 add_compile_definitions(WIN32_LEAN_AND_MEAN NOMINMAX)

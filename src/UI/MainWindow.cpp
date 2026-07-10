@@ -6,6 +6,7 @@
 #include <time.h>
 #include "../Utils/Input.h"
 #include "../Utils/VirtualKeyCodes.h"
+#include "imgui_stdlib.h"
 
 MainWindow::MainWindow()
     : m_counter(0)
@@ -50,6 +51,15 @@ void MainWindow::Draw(ImVec2 WindowSize) {
                 break;
             case Tab_Surveillance:
                 DrawTab_SurveillanceMain();
+                break;
+            case Tab_SC_PointerLine:
+                DrawTab_SC_PointerLineMain();
+                break;
+            case Tab_SC_WindowName:
+                DrawTab_SC_WindowNameMain();
+                break;
+            case Tab_SC_WindowRECT:
+                DrawTab_SC_WindowRECTMain();
                 break;
             }
             ImGui::PopFont();
@@ -142,7 +152,90 @@ void MainWindow::DrawTab_VisionMain() {
     ImGui::TextColored(c_show(0), u8"【视觉效果】");
     ImGui::PopFont();
 
+    ImGui::Checkbox(u8"UI启用渐变色", &Com_Col_urbc[0]);
+    if (!Com_Col_urbc[0]) {
+        ImGui::ColorEdit4(u8"颜色", (float*)&Com_Col[0]);
+    }
 
+    ImGui::PushStyleColor(ImGuiCol_Button, c_show(0));
+    if (ImGui::Button(u8"定位线设置", { 140.0f,0.0f })) Tab = Tab_SC_PointerLine;
+    if (ImGui::Button(u8"窗口名称设置", { 140.0f,0.0f })) Tab = Tab_SC_WindowName;
+    if (ImGui::Button(u8"窗口边框设置", { 140.0f,0.0f })) Tab = Tab_SC_WindowRECT;
+    ImGui::PopStyleColor();
 
 	ImGui::EndChild();
+}
+
+void MainWindow::DrawTab_SC_PointerLineMain() {
+    ImGui::SetCursorPos({ 160.0f,10.0f });
+    ImGui::BeginChild(u8"UI", { 470.0f,330.0f }, true);
+
+    ImGui::PushFont(g_TitleFont);
+    ImGui::TextColored(c_show(0), u8"【定位线设置】");
+    ImGui::PopFont();
+
+    ImGui::Checkbox(u8"启用渐变色", &Com_Col_urbc[2]);
+    if (!Com_Col_urbc[2]) {
+        ImGui::ColorEdit4(u8"颜色", (float*)&Com_Col[2]);
+    }
+    ImGui::InputFloat(u8"线宽", &lw_PointerLine);
+    ImGui::InputFloat(u8"向外偏移量", &off_PointerLine);
+    static const char* items[] = { u8"二分插值",u8"线性插值",u8"无" };
+    ImGui::ListBox(u8"插值类型", &itype_PointerLine, items, 3);
+    if (itype_PointerLine == 0) {
+        ImGui::InputFloat(u8"阈值", &ibt_PointerLine);
+    }
+    else if (itype_PointerLine == 1) {
+        ImGui::InputFloat(u8"阈值", &ict_PointerLine);
+        ImGui::InputFloat(u8"步长", &ics_PointerLine);
+    }
+
+    ImGui::EndChild();
+}
+
+void MainWindow::DrawTab_SC_WindowNameMain() {
+    ImGui::SetCursorPos({ 160.0f,10.0f });
+    ImGui::BeginChild(u8"UI", { 470.0f,330.0f }, true);
+
+    ImGui::PushFont(g_TitleFont);
+    ImGui::TextColored(c_show(0), u8"【窗口名称设置】");
+    ImGui::PopFont();
+
+    ImGui::Checkbox(u8"启用渐变色", &Com_Col_urbc[3]);
+    if (!Com_Col_urbc[2]) {
+        ImGui::ColorEdit4(u8"颜色", (float*)&Com_Col[3]);
+    }
+    ImGui::InputFloat(u8"X向外偏移量", &off_wnX);
+    ImGui::InputFloat(u8"Y向外偏移量", &off_wnY);
+    ImGui::InputText(u8"显示文本", &str_WindowName);
+    ImGui::Text(u8"请使用 ${WindowName} 来表示窗口名称");
+
+    ImGui::EndChild();
+}
+
+void MainWindow::DrawTab_SC_WindowRECTMain() {
+    ImGui::SetCursorPos({ 160.0f,10.0f });
+    ImGui::BeginChild(u8"UI", { 470.0f,330.0f }, true);
+
+    ImGui::PushFont(g_TitleFont);
+    ImGui::TextColored(c_show(0), u8"【窗口边框设置】");
+    ImGui::PopFont();
+
+    ImGui::Checkbox(u8"启用渐变色", &Com_Col_urbc[1]);
+    if (!Com_Col_urbc[2]) {
+        ImGui::ColorEdit4(u8"颜色", (float*)&Com_Col[1]);
+    }
+    ImGui::InputFloat(u8"线宽", &lw_WindowRECT);
+    ImGui::InputFloat(u8"向外偏移量", &off_WindowRECT);
+    static const char* items[] = { u8"二分插值",u8"线性插值",u8"无" };
+    ImGui::ListBox(u8"插值类型", &itype_WindowRECT, items, 3);
+    if (itype_WindowRECT == 0) {
+        ImGui::InputFloat(u8"阈值", &ibt_WindowRECT);
+    }
+    else if (itype_PointerLine == 1) {
+        ImGui::InputFloat(u8"阈值", &ict_WindowRECT);
+        ImGui::InputFloat(u8"步长", &ics_WindowRECT);
+    }
+
+    ImGui::EndChild();
 }

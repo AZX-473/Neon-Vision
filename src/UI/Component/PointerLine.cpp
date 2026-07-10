@@ -1,8 +1,6 @@
 #include "PointerLine.h"
 #include <iostream>
 #include <imgui.h>
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
 #include <Windows.h>
 
 // Define static members declared in PointerLine.h
@@ -68,7 +66,7 @@ void PointerLine::i_None(POINT MousePOS) {
 	h_right = MousePOS.y;
 }
 
-void PointerLine::DrawPointerLine(POINT MousePOS, ImU32 RECTColor, float LineWidth, float Offset) {
+void PointerLine::DrawPointerLine(POINT MousePOS, ImU32 LineColor, float LineWidth, float Offset) {
 	ImGui::SetNextWindowBgAlpha(0.0f); // 确保窗口背景完全透明
 	ImGui::SetNextWindowPos(ImVec2(0, 0));
 	ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
@@ -85,10 +83,10 @@ void PointerLine::DrawPointerLine(POINT MousePOS, ImU32 RECTColor, float LineWid
 	ImGui::Begin("PointerLinebkWindow", nullptr, OverlayWindowflags);
 
 	ImDrawList* draw_list = ImGui::GetForegroundDrawList();
-	draw_list->AddLine(ImVec2(w_top, 0), ImVec2(MousePOS.x, MousePOS.y-Offset), RECTColor, LineWidth);
-	draw_list->AddLine(ImVec2(0, h_left), ImVec2(MousePOS.x - Offset, MousePOS.y), RECTColor, LineWidth);
-	draw_list->AddLine(ImVec2(w_bottom, GetSystemMetrics(SM_CYFULLSCREEN)), ImVec2(MousePOS.x, MousePOS.y + Offset), RECTColor, LineWidth);
-	draw_list->AddLine(ImVec2(GetSystemMetrics(SM_CXFULLSCREEN), h_right), ImVec2(MousePOS.x + Offset, MousePOS.y), RECTColor, LineWidth);
+	draw_list->AddLine(ImVec2(w_top, 0), ImVec2(MousePOS.x, MousePOS.y-Offset), LineColor, LineWidth);
+	draw_list->AddLine(ImVec2(0, h_left), ImVec2(MousePOS.x - Offset, MousePOS.y), LineColor, LineWidth);
+	draw_list->AddLine(ImVec2(w_bottom, GetSystemMetrics(SM_CYFULLSCREEN)), ImVec2(MousePOS.x, MousePOS.y + Offset), LineColor, LineWidth);
+	draw_list->AddLine(ImVec2(GetSystemMetrics(SM_CXFULLSCREEN), h_right), ImVec2(MousePOS.x + Offset, MousePOS.y), LineColor, LineWidth);
 	
 	ImGui::End();
 }

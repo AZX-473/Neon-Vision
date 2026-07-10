@@ -3,6 +3,7 @@
 #include "UI/MainWindow.h"
 #include "UI/Component/WindowRECT.h"
 #include "UI/Component/PointerLine.h"
+#include "UI/Component/WindowName.h"
 #include "Utils/WindowUtils.h"
 #include "FontManager/FontManager.h"
 #include "PublicVariable/Variable.h"
@@ -58,13 +59,20 @@ int main() {
 
         // Draw Functional
         RECT w_rect = WindowUtils::GetWindowRect(WindowUtils::GetWindowUnderCursor());
-        WindowRECT::i_Bisectio(w_rect, 1.0f);
-        WindowRECT::DrawWindowRECT(ImGui::ColorConvertFloat4ToU32({ rb_R, rb_G, rb_B, 255 }), 2.0f , 5.0f);
+        if (itype_WindowRECT == 0) WindowRECT::i_Bisectio(w_rect, ibt_WindowRECT);
+        else if (itype_WindowRECT == 1) WindowRECT::i_ClampedLerp(w_rect, ics_WindowRECT, ict_WindowRECT);
+        else if (itype_WindowRECT == 2) WindowRECT::i_None(w_rect);
+        WindowRECT::DrawWindowRECT(ImGui::ColorConvertFloat4ToU32(c_show(1)), lw_WindowRECT , off_WindowRECT);
 
         POINT MousePOS;
         GetCursorPos(&MousePOS);
-		PointerLine::i_Bisectio(MousePOS, 1.0f);
-		PointerLine::DrawPointerLine(MousePOS, ImGui::ColorConvertFloat4ToU32({ rb_R, rb_G, rb_B, 255 }), 2.0f, 5.0f);
+        if (itype_PointerLine == 0) PointerLine::i_Bisectio(MousePOS, ibt_PointerLine);
+        else if (itype_PointerLine == 1) PointerLine::i_ClampedLerp(MousePOS, ics_PointerLine, ict_PointerLine);
+        else if (itype_PointerLine == 2) PointerLine::i_None(MousePOS);
+		PointerLine::DrawPointerLine(MousePOS, ImGui::ColorConvertFloat4ToU32(c_show(2)), lw_PointerLine, off_PointerLine);
+
+        WindowName::SetShowStr(str_WindowName, WindowUtils::GetWindowTitle(WindowUtils::GetWindowUnderCursor()));
+        WindowName::DrawWindowName(MousePOS, ImGui::ColorConvertFloat4ToU32(c_show(3)), off_wnX, off_wnY);
 
         // Render
         int display_w, display_h;
