@@ -10,6 +10,8 @@ if(MSVC)
     add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 endif()
 
+add_compile_definitions(WIN32_LEAN_AND_MEAN NOMINMAX)
+
 # 查找依赖（不需要 COMPONENTS）
 find_package(imgui CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)

@@ -83,9 +83,26 @@ void WindowRECT::i_None(RECT NewRECT)
 
 void WindowRECT::DrawWindowRECT(ImU32 RECTColor, float LineWidth, float Offset)
 {
-	ImDrawList* draw_list = /*ImGui::GetWindowDrawList()*/ImGui::GetForegroundDrawList();//不然无法在整个显示器置顶绘制
+	ImGui::SetNextWindowBgAlpha(0.0f); // 确保窗口背景完全透明
+	ImGui::SetNextWindowPos(ImVec2(0, 0));
+	ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
+
+	ImGuiWindowFlags OverlayWindowflags =
+		ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoScrollbar |
+		ImGuiWindowFlags_NoInputs |      // 【关键】完全禁用此窗口的所有输入
+		ImGuiWindowFlags_NoBackground |
+		ImGuiWindowFlags_NoNavFocus;
+
+	ImGui::Begin("RECTbkWindow", nullptr, OverlayWindowflags);
+
+	ImDrawList* draw_list = /*ImGui::GetWindowDrawList()*/ImGui::GetWindowDrawList();//不然无法在整个显示器置顶绘制
 	draw_list->AddLine(ImVec2(w_WindowRECT.left - Offset, w_WindowRECT.top - Offset), ImVec2(w_WindowRECT.right + Offset, w_WindowRECT.top - Offset), RECTColor, LineWidth); // Draw Top
 	draw_list->AddLine(ImVec2(w_WindowRECT.left - Offset, w_WindowRECT.top - Offset), ImVec2(w_WindowRECT.left - Offset, w_WindowRECT.bottom + Offset), RECTColor, LineWidth); // Draw Left
 	draw_list->AddLine(ImVec2(w_WindowRECT.right + Offset, w_WindowRECT.top - Offset), ImVec2(w_WindowRECT.right + Offset, w_WindowRECT.bottom + Offset), RECTColor, LineWidth); // Draw Right
 	draw_list->AddLine(ImVec2(w_WindowRECT.left - Offset, w_WindowRECT.bottom + Offset), ImVec2(w_WindowRECT.right + Offset, w_WindowRECT.bottom + Offset), RECTColor, LineWidth); // Draw Bottom
+
+	ImGui::End();
 }

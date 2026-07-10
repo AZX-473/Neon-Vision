@@ -2,6 +2,7 @@
 #include "IGM/ImGuiManager.h"
 #include "UI/MainWindow.h"
 #include "UI/Component/WindowRECT.h"
+#include "UI/Component/PointerLine.h"
 #include "Utils/WindowUtils.h"
 #include "FontManager/FontManager.h"
 #include "PublicVariable/Variable.h"
@@ -59,6 +60,11 @@ int main() {
         RECT w_rect = WindowUtils::GetWindowRect(WindowUtils::GetWindowUnderCursor());
         WindowRECT::i_Bisectio(w_rect, 1.0f);
         WindowRECT::DrawWindowRECT(ImGui::ColorConvertFloat4ToU32({ rb_R, rb_G, rb_B, 255 }), 2.0f , 5.0f);
+
+        POINT MousePOS;
+        GetCursorPos(&MousePOS);
+		PointerLine::i_Bisectio(MousePOS, 1.0f);
+		PointerLine::DrawPointerLine(MousePOS, ImGui::ColorConvertFloat4ToU32({ rb_R, rb_G, rb_B, 255 }), 2.0f, 5.0f);
 
         // Render
         int display_w, display_h;
