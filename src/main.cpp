@@ -7,9 +7,11 @@
 #include "Utils/WindowUtils.h"
 #include "FontManager/FontManager.h"
 #include "PublicVariable/Variable.h"
+#include "Utils/VirtualKeyCodes.h"
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h> 
 #include <iostream>
+#include "UI/Component/RainingKey.h"
 
 int main() {
 
@@ -48,6 +50,18 @@ int main() {
     // Create main window UI
     MainWindow mainWindow;
 
+    // Register a default row of raining keys (defaults applied when parameters omitted)
+    float baseX = 80.0f;
+    float baseY = 1000.0f; // y remains same for all keys by default
+    float spacing = 50.0f; // x will accumulate per key
+    const char* labels[] = { "Q","W","E","R","T","Y","U","I","O","P" };
+    int vks[] = { VK_Q, VK_W, VK_E, VK_R, VK_T, VK_Y, VK_U, VK_I, VK_O, VK_P };
+    for (int i = 0; i < 10; ++i) {
+        float x = baseX + i * spacing;
+        // Use higher speed so blocks move visibly fast (pixels per second)
+        RainingKey::AddKey(x, baseY, vks[i], /*RainingSpeed*/ 500.0f, std::string(labels[i]));
+    }
+
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -58,21 +72,30 @@ int main() {
         mainWindow.Draw();
 
         // Draw Functional
-        RECT w_rect = WindowUtils::GetWindowRect(WindowUtils::GetWindowUnderCursor());
-        if (itype_WindowRECT == 0) WindowRECT::i_Bisectio(w_rect, ibt_WindowRECT);
-        else if (itype_WindowRECT == 1) WindowRECT::i_ClampedLerp(w_rect, ics_WindowRECT, ict_WindowRECT);
-        else if (itype_WindowRECT == 2) WindowRECT::i_None(w_rect);
-        WindowRECT::DrawWindowRECT(ImGui::ColorConvertFloat4ToU32(c_show(1)), lw_WindowRECT , off_WindowRECT);
+        if (ol_WindowRECT) {
+            RECT w_rect = WindowUtils::GetWindowRect(WindowUtils::GetWindowUnderCursor());
+            if (itype_WindowRECT == 0) WindowRECT::i_Bisectio(w_rect, ibt_WindowRECT);
+            else if (itype_WindowRECT == 1) WindowRECT::i_ClampedLerp(w_rect, ics_WindowRECT, ict_WindowRECT);
+            else if (itype_WindowRECT == 2) WindowRECT::i_None(w_rect);
+            WindowRECT::DrawWindowRECT(ImGui::ColorConvertFloat4ToU32(c_show(1)), lw_WindowRECT, off_WindowRECT);
+        }
 
         POINT MousePOS;
         GetCursorPos(&MousePOS);
-        if (itype_PointerLine == 0) PointerLine::i_Bisectio(MousePOS, ibt_PointerLine);
-        else if (itype_PointerLine == 1) PointerLine::i_ClampedLerp(MousePOS, ics_PointerLine, ict_PointerLine);
-        else if (itype_PointerLine == 2) PointerLine::i_None(MousePOS);
-		PointerLine::DrawPointerLine(MousePOS, ImGui::ColorConvertFloat4ToU32(c_show(2)), lw_PointerLine, off_PointerLine);
+        if (ol_PointerLine) {
+            if (itype_PointerLine == 0) PointerLine::i_Bisectio(MousePOS, ibt_PointerLine);
+            else if (itype_PointerLine == 1) PointerLine::i_ClampedLerp(MousePOS, ics_PointerLine, ict_PointerLine);
+            else if (itype_PointerLine == 2) PointerLine::i_None(MousePOS);
+            PointerLine::DrawPointerLine(MousePOS, ImGui::ColorConvertFloat4ToU32(c_show(2)), lw_PointerLine, off_PointerLine);
+        }
 
-        WindowName::SetShowStr(str_WindowName, WindowUtils::GetWindowTitle(WindowUtils::GetWindowUnderCursor()));
-        WindowName::DrawWindowName(MousePOS, ImGui::ColorConvertFloat4ToU32(c_show(3)), off_wnX, off_wnY);
+        if (ol_WindowName) {
+            WindowName::SetShowStr(str_WindowName, WindowUtils::GetWindowTitle(WindowUtils::GetWindowUnderCursor()));
+            WindowName::DrawWindowName(MousePOS, ImGui::ColorConvertFloat4ToU32(c_show(3)), off_wnX, off_wnY);
+        }
+
+        // Update and draw raining key overlays
+        RainingKey::UpdateRainingBlocks();
 
         // Render
         int display_w, display_h;

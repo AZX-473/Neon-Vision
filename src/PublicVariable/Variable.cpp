@@ -17,3 +17,5 @@ float lw_PointerLine=2.0f, off_PointerLine=5.0f, ibt_PointerLine=1.0f, ict_Point
 int itype_PointerLine=0;
 std::string str_WindowName="${WindowName}";
 float off_wnX=5.0f, off_wnY=5.0f;
+
+bool ol_WindowRECT = true, ol_WindowName = true, ol_PointerLine = true;

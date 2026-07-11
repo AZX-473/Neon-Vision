@@ -3,35 +3,42 @@
   "configurePresets": [
     {
       "name": "default",
-      "hidden": true,
+      "displayName": "Default Config",
+      "description": "使用 vcpkg 工具链的默认配置",
       "generator": "Visual Studio 18 2026",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": {
+          "type": "FILEPATH",
+          "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        },
         "CMAKE_CXX_STANDARD": "17",
         "CMAKE_CXX_STANDARD_REQUIRED": "ON"
       }
     },
     {
-      "name": "vcpkg",
+      "name": "release",
+      "displayName": "Release Config",
+      "description": "Release 构建配置",
       "inherits": "default",
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": {
-          "type": "FILEPATH",
-          "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
-        }
+        "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
-      "name": "vcpkg-windows",
-      "inherits": "vcpkg",
-      "generator": "Visual Studio 18 2026",
-      "architecture": "x64"
+      "name": "debug",
+      "displayName": "Debug Config",
+      "description": "Debug 构建配置",
+      "inherits": "default",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
     }
   ],
   "buildPresets": [
     {
       "name": "default",
-      "configurePreset": "vcpkg-windows"
+      "configurePreset": "default"
     }
   ]
 }

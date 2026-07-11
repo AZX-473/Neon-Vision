@@ -32,7 +32,7 @@ vcpkg install imgui[core,glfw-binding,opengl3-binding]:x64-windows
 4.编译项目
 在项目根目录下执行
 ``` BASH
-cmake -B build -A x64
+cmake -B build -S .
 cmake --build build --config Release
 ```
 5.构建完成的可执行文件位于 build/Release 目录下
