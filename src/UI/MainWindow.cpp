@@ -207,7 +207,7 @@ void MainWindow::DrawTab_SC_WindowNameMain() {
     ImGui::PopFont();
 
     ImGui::Checkbox(u8"启用渐变色", &Com_Col_urbc[3]);
-    if (!Com_Col_urbc[2]) {
+    if (!Com_Col_urbc[3]) {
         ImGui::ColorEdit4(u8"颜色", (float*)&Com_Col[3]);
     }
     ImGui::InputFloat(u8"X向外偏移量", &off_wnX);
@@ -227,7 +227,7 @@ void MainWindow::DrawTab_SC_WindowRECTMain() {
     ImGui::PopFont();
 
     ImGui::Checkbox(u8"启用渐变色", &Com_Col_urbc[1]);
-    if (!Com_Col_urbc[2]) {
+    if (!Com_Col_urbc[1]) {
         ImGui::ColorEdit4(u8"颜色", (float*)&Com_Col[1]);
     }
     ImGui::InputFloat(u8"线宽", &lw_WindowRECT);
@@ -237,7 +237,7 @@ void MainWindow::DrawTab_SC_WindowRECTMain() {
     if (itype_WindowRECT == 0) {
         ImGui::InputFloat(u8"阈值", &ibt_WindowRECT);
     }
-    else if (itype_PointerLine == 1) {
+    else if (itype_WindowRECT == 1) {
         ImGui::InputFloat(u8"阈值", &ict_WindowRECT);
         ImGui::InputFloat(u8"步长", &ics_WindowRECT);
     }
