@@ -67,7 +67,7 @@ void PointerLine::i_None(POINT MousePOS) {
 }
 
 void PointerLine::DrawPointerLine(POINT MousePOS, ImU32 LineColor, float LineWidth, float Offset) {
-	ImGui::SetNextWindowBgAlpha(0.0f); // 确保窗口背景完全透明
+	ImGui::SetNextWindowBgAlpha(0.0f); 
 	ImGui::SetNextWindowPos(ImVec2(0, 0));
 	ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
 
@@ -76,7 +76,7 @@ void PointerLine::DrawPointerLine(POINT MousePOS, ImU32 LineColor, float LineWid
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoScrollbar |
-		ImGuiWindowFlags_NoInputs |      // 【关键】完全禁用此窗口的所有输入
+		ImGuiWindowFlags_NoInputs |   
 		ImGuiWindowFlags_NoBackground |
 		ImGuiWindowFlags_NoNavFocus;
 

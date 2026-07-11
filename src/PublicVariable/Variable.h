@@ -1,4 +1,10 @@
 #pragma once
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <imgui.h>
 #include <Windows.h>
 #include <string>
@@ -24,3 +30,5 @@ extern float lw_PointerLine, off_PointerLine, ibt_PointerLine, ict_PointerLine, 
 extern int itype_PointerLine;
 extern std::string str_WindowName;
 extern float off_wnX,off_wnY;
+
+extern bool ol_WindowName, ol_WindowRECT, ol_PointerLine;

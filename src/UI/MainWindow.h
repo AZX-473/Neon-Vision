@@ -27,7 +27,7 @@ private:
     bool m_checkbox;
     std::string m_statusMessage;
     std::vector<float> m_values;
-	bool MainWindowShow = true;
+	bool MainWindowShow = false;
 
     #define Tab_Home 0
     #define Tab_Vision 1
@@ -36,6 +36,7 @@ private:
     #define Tab_SC_WindowRECT 4
     #define Tab_SC_PointerLine 5
     #define Tab_SC_WindowName 6
+    #define Tab_SC_RainingKey 7
 	int Tab = Tab_Home;  // 当前选中的标签页
 
     void DrawMENU();
@@ -46,4 +47,5 @@ private:
     void DrawTab_SC_WindowRECTMain();
     void DrawTab_SC_PointerLineMain();
     void DrawTab_SC_WindowNameMain();
+    void DrawTab_SC_RainingKeyMain();
 };

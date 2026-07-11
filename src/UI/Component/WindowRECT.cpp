@@ -5,7 +5,7 @@
 
 RECT WindowRECT::w_WindowRECT = { 0, 0, 0, 0 };
 
-void WindowRECT::i_ClampedLerp(RECT NewRECT, float l_Step, float Threshold)
+void WindowRECT::i_ClampedLerp(RECT NewRECT, LONG l_Step, float Threshold)
 {
 	if (w_WindowRECT.left < NewRECT.left)
 	{

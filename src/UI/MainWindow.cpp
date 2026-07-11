@@ -7,6 +7,7 @@
 #include "../Utils/Input.h"
 #include "../Utils/VirtualKeyCodes.h"
 #include "imgui_stdlib.h"
+#include "Component/RainingKey.h"
 
 MainWindow::MainWindow()
     : m_counter(0)
@@ -20,6 +21,8 @@ MainWindow::MainWindow()
     for (int i = 0; i < 100; i++) {
         m_values.push_back(rand() % 100 / 100.0f);
     }
+
+
 }
 
 void MainWindow::Draw(ImVec2 WindowSize) {
@@ -60,6 +63,9 @@ void MainWindow::Draw(ImVec2 WindowSize) {
                 break;
             case Tab_SC_WindowRECT:
                 DrawTab_SC_WindowRECTMain();
+                break;
+            case Tab_SC_RainingKey:
+                DrawTab_SC_RainingKeyMain();
                 break;
             }
             ImGui::PopFont();
@@ -122,11 +128,11 @@ void MainWindow::DrawTab_ModeMain() {
     ImGui::TextColored(c_show(0), u8"【功能】");
     ImGui::PopFont();
 
-    bool tmp=false;
-    ImGui::Checkbox(u8"鼠标辅助功能", &tmp);
-    ImGui::Checkbox(u8"对选中窗口操作", &tmp);
-    ImGui::Checkbox(u8"电脑辅助功能", &tmp);
-    ImGui::Checkbox(u8"剪切本功能", &tmp);
+    ImGui::Checkbox(u8"锁定窗口", &MainWindowShow);
+
+    ImGui::Checkbox(u8"鼠标定位线", &ol_PointerLine);
+    ImGui::Checkbox(u8"窗口边框", &ol_WindowRECT);
+    ImGui::Checkbox(u8"窗口名称", &ol_WindowName);
 
     ImGui::EndChild();
 }
@@ -161,6 +167,7 @@ void MainWindow::DrawTab_VisionMain() {
     if (ImGui::Button(u8"定位线设置", { 140.0f,0.0f })) Tab = Tab_SC_PointerLine;
     if (ImGui::Button(u8"窗口名称设置", { 140.0f,0.0f })) Tab = Tab_SC_WindowName;
     if (ImGui::Button(u8"窗口边框设置", { 140.0f,0.0f })) Tab = Tab_SC_WindowRECT;
+    if (ImGui::Button(u8"按键下落设置", { 140.0f,0.0f })) Tab = Tab_SC_RainingKey;
     ImGui::PopStyleColor();
 
 	ImGui::EndChild();
@@ -235,6 +242,96 @@ void MainWindow::DrawTab_SC_WindowRECTMain() {
     else if (itype_PointerLine == 1) {
         ImGui::InputFloat(u8"阈值", &ict_WindowRECT);
         ImGui::InputFloat(u8"步长", &ics_WindowRECT);
+    }
+
+    ImGui::EndChild();
+}
+
+void MainWindow::DrawTab_SC_RainingKeyMain() {
+    ImGui::SetCursorPos({ 160.0f,10.0f });
+    ImGui::BeginChild(u8"RainingKeyUI", { 470.0f,330.0f }, true);
+
+    ImGui::PushFont(g_TitleFont);
+    ImGui::TextColored(c_show(0), u8"【按键下落设置】");
+    ImGui::PopFont();
+
+    // Controls: list all keys
+    int count = RainingKey::GetKeyCount();
+    if (ImGui::Button(u8"添加按键")) {
+        // add at default position to the right
+        float baseX = 200.0f + count * 120.0f;
+        RainingKey::AddKey(baseX, 200.0f, VK_A + (count % 26), 500.0f, std::string("K"));
+    }
+
+    ImGui::Separator();
+
+    static int recordingIndex = -1; // which key index is waiting for VK input
+
+    for (int i = 0; i < count; ++i) {
+        ImGui::PushID(i);
+        KeyBlock kb = RainingKey::GetKeyCopy(i);
+        // Use a stable header label (without the editable text) so collapsing state isn't lost when s_key changes
+        std::string header = "Key " + std::to_string(i);
+        if (ImGui::CollapsingHeader(header.c_str())) {
+            ImGui::SameLine(); ImGui::TextUnformatted(kb.s_key.c_str());
+            bool dirty = false;
+
+            // operate directly on a local copy and apply immediately when a control changes
+            float x = kb.x; float y = kb.y;
+            float speed = kb.RainingSpeed;
+            float width = kb.width;
+            float maxh = kb.max_height;
+            float spawn = kb.spawnInterval;
+            int vk = kb.vk;
+            char label[64]; strncpy(label, kb.s_key.c_str(), 63); label[63] = 0;
+            ImVec4 bg = ImGui::ColorConvertU32ToFloat4(kb.bg_col);
+            ImVec4 bgp = ImGui::ColorConvertU32ToFloat4(kb.bg_col_pressed);
+            ImVec4 rainc = ImGui::ColorConvertU32ToFloat4(kb.raining_col);
+
+            // Allow dragging to change position
+            if (ImGui::DragFloat("X", &x, 1.0f, 0.0f, 10000.0f)) { kb.x = x; dirty = true; }
+            if (ImGui::DragFloat("Y", &y, 1.0f, 0.0f, 10000.0f)) { kb.y = y; dirty = true; }
+            if (ImGui::InputFloat("速度 (px/s)", &speed)) { kb.RainingSpeed = speed; dirty = true; }
+            if (ImGui::InputFloat("宽度", &width)) { kb.width = width; dirty = true; }
+            if (ImGui::InputFloat("最大长度", &maxh)) { kb.max_height = maxh; dirty = true; }
+            if (ImGui::InputFloat("生成间隔(s)", &spawn)) { kb.spawnInterval = spawn; dirty = true; }
+            if (ImGui::InputInt("VK码", &vk)) { kb.vk = vk; dirty = true; }
+            ImGui::SameLine();
+            if (recordingIndex == i) {
+                ImGui::TextColored(ImVec4(1,0.5f,0,1), "正在录入... 按下任意键");
+            } else {
+                if (ImGui::SmallButton("录入VK")) {
+                    recordingIndex = i;
+                }
+            }
+            if (ImGui::InputText("显示文本", label, 64)) { kb.s_key = std::string(label); dirty = true; }
+
+            if (ImGui::ColorEdit4("背景未按下颜色", (float*)&bg)) { bg.w = 1.0f; kb.bg_col = ImGui::ColorConvertFloat4ToU32(bg); dirty = true; }
+            if (ImGui::ColorEdit4("背景按下颜色", (float*)&bgp)) { bgp.w = 1.0f; kb.bg_col_pressed = ImGui::ColorConvertFloat4ToU32(bgp); dirty = true; }
+            if (ImGui::ColorEdit4("下落颜色", (float*)&rainc)) { rainc.w = 1.0f; kb.raining_col = ImGui::ColorConvertFloat4ToU32(rainc); dirty = true; }
+
+            if (dirty) {
+                RainingKey::UpdateKey(i, kb);
+            }
+
+            // If this key is in recording mode, scan for first key down
+            if (recordingIndex == i) {
+                for (int vkCandidate = 0x08; vkCandidate <= 0xFE; ++vkCandidate) {
+                    if (KEY_DOWN(vkCandidate)) {
+                        kb.vk = vkCandidate;
+                        RainingKey::UpdateKey(i, kb);
+                        recordingIndex = -1;
+                        break;
+                    }
+                }
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button("删除")) {
+                RainingKey::RemoveKey(i);
+            }
+        }
+        ImGui::PopID();
     }
 
     ImGui::EndChild();
