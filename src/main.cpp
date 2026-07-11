@@ -32,6 +32,12 @@ int main() {
 
 	hWnd = glfwGetWin32Window(window); // Store the window handle in the global variable
 
+    HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(101)); // 101 是资源 ID
+    if (hIcon) {
+        SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+        SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+    }
+
     // Center window
     WindowManager::CenterWindow(window);
 

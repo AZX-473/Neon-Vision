@@ -38,6 +38,15 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 # 5. 创建可执行文件
 # ============================================================
 if(WIN32)
+    # 添加资源文件到源列表
+    list(APPEND SOURCES "resources/app.rc")
+    # 或者显式声明，让 VS 知道这是一个资源文件
+    set(RESOURCE_FILES "resources/app.rc")
+else()
+    set(RESOURCE_FILES "")
+endif()
+
+if(WIN32)
     add_executable(${PROJECT_NAME} WIN32 ${SOURCES})
 else()
     add_executable(${PROJECT_NAME} ${SOURCES})
