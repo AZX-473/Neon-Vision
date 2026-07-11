@@ -274,6 +274,8 @@ void MainWindow::DrawTab_SC_RainingKeyMain() {
         std::string header = "Key " + std::to_string(i);
         if (ImGui::CollapsingHeader(header.c_str())) {
             ImGui::SameLine(); ImGui::TextUnformatted(kb.s_key.c_str());
+        std::string header = "Key " + std::to_string(i) + " - " + kb.s_key;
+        if (ImGui::CollapsingHeader(header.c_str())) {
             bool dirty = false;
 
             // operate directly on a local copy and apply immediately when a control changes
