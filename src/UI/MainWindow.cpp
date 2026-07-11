@@ -304,9 +304,9 @@ void MainWindow::DrawTab_SC_RainingKeyMain() {
             }
             if (ImGui::InputText("显示文本", label, 64)) { kb.s_key = std::string(label); dirty = true; }
 
-            if (ImGui::ColorEdit4("背景未按下颜色", (float*)&bg)) { bg.w = 1.0f; kb.bg_col = ImGui::ColorConvertFloat4ToU32(bg); dirty = true; }
-            if (ImGui::ColorEdit4("背景按下颜色", (float*)&bgp)) { bgp.w = 1.0f; kb.bg_col_pressed = ImGui::ColorConvertFloat4ToU32(bgp); dirty = true; }
-            if (ImGui::ColorEdit4("下落颜色", (float*)&rainc)) { rainc.w = 1.0f; kb.raining_col = ImGui::ColorConvertFloat4ToU32(rainc); dirty = true; }
+            if (ImGui::ColorEdit4("背景未按下颜色", (float*)&bg)) { kb.bg_col = ImGui::ColorConvertFloat4ToU32(bg); dirty = true; }
+            if (ImGui::ColorEdit4("背景按下颜色", (float*)&bgp)) { kb.bg_col_pressed = ImGui::ColorConvertFloat4ToU32(bgp); dirty = true; }
+            if (ImGui::ColorEdit4("下落颜色", (float*)&rainc)) { kb.raining_col = ImGui::ColorConvertFloat4ToU32(rainc); dirty = true; }
 
             if (dirty) {
                 RainingKey::UpdateKey(i, kb);

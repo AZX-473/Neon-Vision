@@ -64,14 +64,6 @@ void RainingKey::UpdateRainingBlocks() {
 	double now = ImGui::GetTime();
 	float dt = ImGui::GetIO().DeltaTime; // seconds since last frame
 
-	static int draggingIndex = -1;
-	static float dragOffsetX = 0.0f;
-	static float dragOffsetY = 0.0f;
-
-	POINT cursorPos;
-	GetCursorPos(&cursorPos);
-	bool lbuttonDown = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
-
 	for (size_t i = 0; i < KeyBlocks.size(); ++i) {
 		ImGui::PushFont(g_MainFont);
 		KeyBlock& kb = KeyBlocks[i];
@@ -84,38 +76,9 @@ void RainingKey::UpdateRainingBlocks() {
 		ImVec2 kb1(kb.x + bw / 2.0f, kb.y + bh / 2.0f);
 		ImU32 bg = KEY_DOWN(kb.vk) ? kb.bg_col_pressed : kb.bg_col;
 		draw_list->AddRectFilled(kb0, kb1, bg, 6.0f);
-		draw_list->AddRect(kb0, kb1, IM_COL32(0,0,0,200), 6.0f, 0, 1.0f);
+		draw_list->AddRect(kb0, kb1, IM_COL32(0, 0, 0, 200), 6.0f, 0, 1.0f);
 		ImVec2 text_size = ImGui::CalcTextSize(kb.s_key.c_str());
-		draw_list->AddText(ImVec2(kb.x - text_size.x/2.0f, kb.y - text_size.y/2.0f), IM_COL32(255,255,255,255), kb.s_key.c_str());
-
-		// Handle dragging via OS mouse (so overlay can remain NoInputs)
-		RECT rect;
-		rect.left = (LONG)kb0.x;
-		rect.top = (LONG)kb0.y;
-		rect.right = (LONG)kb1.x;
-		rect.bottom = (LONG)kb1.y;
-
-		// Start dragging if left button pressed inside rect and not already dragging another
-		if (lbuttonDown && draggingIndex == -1) {
-			if (cursorPos.x >= rect.left && cursorPos.x <= rect.right && cursorPos.y >= rect.top && cursorPos.y <= rect.bottom) {
-				draggingIndex = (int)i;
-				dragOffsetX = cursorPos.x - kb.x;
-				dragOffsetY = cursorPos.y - kb.y;
-			}
-		}
-
-		// If currently dragging this item, update its position
-		if (draggingIndex == (int)i) {
-			if (lbuttonDown) {
-				float newX = (float)cursorPos.x - dragOffsetX;
-				float newY = (float)cursorPos.y - dragOffsetY;
-				kb.x = newX; kb.y = newY;
-				RainingKey::UpdateKey((int)i, kb);
-			} else {
-				// release
-				draggingIndex = -1;
-			}
-		}
+		draw_list->AddText(ImVec2(kb.x - text_size.x / 2.0f, kb.y - text_size.y / 2.0f), IM_COL32(255, 255, 255, 255), kb.s_key.c_str());
 
 		bool isPressed = KEY_DOWN(kb.vk);
 
@@ -130,16 +93,18 @@ void RainingKey::UpdateRainingBlocks() {
 				nb.bottomY = kb.y;        // tail at base
 				blocks.push_back(nb);
 				kb.lastSpawnTime = (float)now;
-			} else {
+			}
+			else {
 				// continuing press: extend last block's bottom to current base y to avoid gap
 				if (!blocks.empty()) {
-					RainingBlock &last = blocks.back();
+					RainingBlock& last = blocks.back();
 					// ensure bottomY is at least kb.y (connect to base)
 					if (kb.y > last.bottomY) last.bottomY = kb.y;
 				}
 			}
 			kb.lastPressed = true;
-		} else {
+		}
+		else {
 			kb.lastPressed = false;
 			kb.lastSpawnTime = 0.0f;
 		}
@@ -147,7 +112,7 @@ void RainingKey::UpdateRainingBlocks() {
 		// Update blocks: move upward (top and bottom decrease by speed * dt).
 		float move = kb.RainingSpeed * dt;
 		const float shrinkMultiplier = 1.5f; // bottom moves faster when shrinking
-		for (auto &b : blocks) {
+		for (auto& b : blocks) {
 			if (!b.active) continue;
 
 			if (b.shrinking) {
@@ -171,7 +136,7 @@ void RainingKey::UpdateRainingBlocks() {
 		}
 
 		// Clamp blocks that reached max_height based on block length (bottom - top)
-		for (auto &b : blocks) {
+		for (auto& b : blocks) {
 			if (!b.active || b.fixed || b.shrinking) continue;
 			float length = b.bottomY - b.topY;
 			if (length >= kb.max_height) {
@@ -182,7 +147,7 @@ void RainingKey::UpdateRainingBlocks() {
 		}
 
 		// Draw active raining blocks
-		for (const auto &b : blocks) {
+		for (const auto& b : blocks) {
 			if (!b.active) continue;
 			float w = kb.width > 0.0f ? kb.width : 100.0f;
 			// clip the top so that nothing above kb.y - max_height is drawn
@@ -191,29 +156,29 @@ void RainingKey::UpdateRainingBlocks() {
 			if (drawTop < clipTop) drawTop = clipTop;
 			// if after clipping there's no height left, skip drawing
 			if (drawTop >= b.bottomY) continue;
-			ImVec2 p0(b.x - w/2.0f, drawTop);
-			ImVec2 p1(b.x + w/2.0f, b.bottomY);
+			ImVec2 p0(b.x - w / 2.0f, drawTop);
+			ImVec2 p1(b.x + w / 2.0f, b.bottomY);
 			draw_list->AddRectFilled(p0, p1, kb.raining_col, 4.0f);
 		}
 
 		// Remove blocks that moved completely above the visible clip (no longer visible)
 		float clipTop = kb.y - kb.max_height;
-		blocks.erase(std::remove_if(blocks.begin(), blocks.end(), [&](const RainingBlock &b) {
+		blocks.erase(std::remove_if(blocks.begin(), blocks.end(), [&](const RainingBlock& b) {
 			if (!b.active) return true;
 			// if bottom is above the clip top, the block is completely out of range
 			if (b.bottomY <= clipTop + 0.5f) return true;
 			// also remove tiny shrunk blocks
 			if (b.shrinking && (b.bottomY - b.topY) <= 1.0f) return true;
 			return false;
-		}), blocks.end());
+			}), blocks.end());
 
 		// Remove inactive or fully shrunk blocks
-		blocks.erase(std::remove_if(blocks.begin(), blocks.end(), [&](const RainingBlock &b) {
+		blocks.erase(std::remove_if(blocks.begin(), blocks.end(), [&](const RainingBlock& b) {
 			if (!b.active) return true;
 			// if shrinking and very small, remove
 			if (b.shrinking && (b.bottomY - b.topY) <= 1.0f) return true;
 			return false;
-		}), blocks.end());
+			}), blocks.end());
 		ImGui::PopFont();
 	}
 
