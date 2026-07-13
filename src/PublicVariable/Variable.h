@@ -27,6 +27,8 @@ extern float off_wnX,off_wnY;
 
 extern bool ol_WindowName, ol_WindowRECT, ol_PointerLine;
 
-extern bool cp_showblock, cp_showRGBn;
+extern bool ol_RainingKey;
+
+extern bool cp_showblock, cp_showRGBn,ol_ColorPicker;
 extern float cp_bwlong;
 extern LONG off_cpx,off_cpy;

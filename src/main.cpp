@@ -101,10 +101,12 @@ int main() {
             WindowName::DrawWindowName(MousePOS, ImGui::ColorConvertFloat4ToU32(c_show(3)), off_wnX, off_wnY);
         }
 
-        ColorPicker::DrawPickerColor({ MousePOS.x + off_cpx,MousePOS.y + off_cpy }, ColorPicker::GetColorFromPos(MousePOS),cp_showblock,cp_showRGBn, cp_bwlong,c_show(4));
+        if(ol_ColorPicker)
+            ColorPicker::DrawPickerColor({ MousePOS.x + off_cpx,MousePOS.y + off_cpy }, ColorPicker::GetColorFromPos(MousePOS),cp_showblock,cp_showRGBn, cp_bwlong,c_show(4));
 
         // Update and draw raining key overlays
-        RainingKey::UpdateRainingBlocks();
+        if (ol_RainingKey)
+            RainingKey::UpdateRainingBlocks();
 
         // Render
         int display_w, display_h;

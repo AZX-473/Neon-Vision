@@ -131,9 +131,35 @@ void MainWindow::DrawTab_ModeMain() {
 
     ImGui::Checkbox(u8"锁定窗口", &MainWindowShow);
 
-    ImGui::Checkbox(u8"鼠标定位线", &ol_PointerLine);
-    ImGui::Checkbox(u8"窗口边框", &ol_WindowRECT);
-    ImGui::Checkbox(u8"窗口名称", &ol_WindowName);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ol_PointerLine) ? ImVec4(0.0f, 0.7f, 0.0f, 1.0f) : ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+    ImGui::Text(u8"鼠标定位线");
+    ImGui::SameLine();
+    if (ImGui::Button((ol_PointerLine)?u8"启用##0":u8"禁用##0", {140.0f,0.0f})) ol_PointerLine ^= 1;
+    ImGui::PopStyleColor();
+
+    ImGui::PushStyleColor(ImGuiCol_Button, (ol_WindowRECT) ? ImVec4(0.0f, 0.7f, 0.0f, 1.0f) : ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+    ImGui::Text(u8"窗口边框");
+    ImGui::SameLine();
+    if (ImGui::Button((ol_WindowRECT) ? u8"启用##1" : u8"禁用##1", { 140.0f,0.0f })) ol_WindowRECT ^= 1;
+    ImGui::PopStyleColor();
+
+    ImGui::PushStyleColor(ImGuiCol_Button, (ol_WindowName) ? ImVec4(0.0f, 0.7f, 0.0f, 1.0f) : ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+    ImGui::Text(u8"窗口名称");
+    ImGui::SameLine();
+    if (ImGui::Button((ol_WindowName) ? u8"启用##2" : u8"禁用##2", { 140.0f,0.0f })) ol_WindowName ^= 1;
+    ImGui::PopStyleColor();
+
+    ImGui::PushStyleColor(ImGuiCol_Button, (ol_RainingKey) ? ImVec4(0.0f, 0.7f, 0.0f, 1.0f) : ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+    ImGui::Text(u8"键雨");
+    ImGui::SameLine();
+    if (ImGui::Button((ol_RainingKey) ? u8"启用##3" : u8"禁用##3", { 140.0f,0.0f })) ol_RainingKey ^= 1;
+    ImGui::PopStyleColor();
+
+    ImGui::PushStyleColor(ImGuiCol_Button, (ol_ColorPicker) ? ImVec4(0.0f, 0.7f, 0.0f, 1.0f) : ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+    ImGui::Text(u8"取色器");
+    ImGui::SameLine();
+    if (ImGui::Button((ol_ColorPicker) ? u8"启用##4" : u8"禁用##4", { 140.0f,0.0f })) ol_ColorPicker ^= 1;
+    ImGui::PopStyleColor();
 
     ImGui::EndChild();
 }
@@ -164,12 +190,12 @@ void MainWindow::DrawTab_VisionMain() {
         ImGui::ColorEdit4(u8"颜色", (float*)&Com_Col[0]);
     }
 
-    ImGui::PushStyleColor(ImGuiCol_Button, c_show(0));
-    if (ImGui::Button(u8"定位线设置", { 140.0f,0.0f })) Tab = Tab_SC_PointerLine;
-    if (ImGui::Button(u8"窗口名称设置", { 140.0f,0.0f })) Tab = Tab_SC_WindowName;
-    if (ImGui::Button(u8"窗口边框设置", { 140.0f,0.0f })) Tab = Tab_SC_WindowRECT;
-    if (ImGui::Button(u8"按键下落设置", { 140.0f,0.0f })) Tab = Tab_SC_RainingKey;
-    if (ImGui::Button(u8"取色器设置", { 140.0f,0.0f })) Tab = Tab_SC_ColorPicker;
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+    if (ol_PointerLine) if (ImGui::Button(u8"定位线设置", { 140.0f,0.0f })) Tab = Tab_SC_PointerLine;
+    if (ol_WindowName) if (ImGui::Button(u8"窗口名称设置", { 140.0f,0.0f })) Tab = Tab_SC_WindowName;
+    if (ol_WindowRECT) if (ImGui::Button(u8"窗口边框设置", { 140.0f,0.0f })) Tab = Tab_SC_WindowRECT;
+    if (ol_RainingKey) if (ImGui::Button(u8"按键下落设置", { 140.0f,0.0f })) Tab = Tab_SC_RainingKey;
+    if (ol_ColorPicker) if (ImGui::Button(u8"取色器设置", { 140.0f,0.0f })) Tab = Tab_SC_ColorPicker;
     ImGui::PopStyleColor();
 
 	ImGui::EndChild();

@@ -20,6 +20,8 @@ float off_wnX=5.0f, off_wnY=5.0f;
 
 bool ol_WindowRECT = true, ol_WindowName = true, ol_PointerLine = true;
 
-bool cp_showblock = true, cp_showRGBn = true;
+bool ol_RainingKey = true;
+
+bool cp_showblock = true, cp_showRGBn = true,ol_ColorPicker=true;
 float cp_bwlong = 20.0f;
 LONG off_cpx=5.0f,off_cpy=30.0f;
