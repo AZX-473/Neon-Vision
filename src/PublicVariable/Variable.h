@@ -26,3 +26,7 @@ extern std::string str_WindowName;
 extern float off_wnX,off_wnY;
 
 extern bool ol_WindowName, ol_WindowRECT, ol_PointerLine;
+
+extern bool cp_showblock, cp_showRGBn;
+extern float cp_bwlong;
+extern LONG off_cpx,off_cpy;

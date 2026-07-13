@@ -6,13 +6,7 @@
       "displayName": "Default Config",
       "description": "使用 vcpkg 工具链",
       "generator": "Visual Studio 18 2026",
-      "binaryDir": "${sourceDir}/build",
-      "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": {
-          "type": "FILEPATH",
-          "value": "C:/Users/AZX/vcpkg/vcpkg/scripts/buildsystems/vcpkg.cmake"
-        }
-      }
+      "binaryDir": "${sourceDir}/build"
     }
   ]
 }

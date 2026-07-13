@@ -4,6 +4,7 @@
 #include "UI/Component/WindowRECT.h"
 #include "UI/Component/PointerLine.h"
 #include "UI/Component/WindowName.h"
+#include "UI/Component/ColorPicker.h"
 #include "Utils/WindowUtils.h"
 #include "FontManager/FontManager.h"
 #include "PublicVariable/Variable.h"
@@ -60,8 +61,8 @@ int main() {
     float baseX = 80.0f;
     float baseY = 1000.0f; // y remains same for all keys by default
     float spacing = 50.0f; // x will accumulate per key
-    const char* labels[] = { "Q","W","E","R","T","Y","U","I","O","P" };
-    int vks[] = { VK_Q, VK_W, VK_E, VK_R, VK_T, VK_Y, VK_U, VK_I, VK_O, VK_P };
+    const char* labels[] = { "A","S","D","F","G","H","J","K","L","space" };
+    int vks[] = { VK_A, VK_S, VK_D, VK_F, VK_G, VK_H, VK_J, VK_K, VK_L, VK_SPACE };
     for (int i = 0; i < 10; ++i) {
         float x = baseX + i * spacing;
         // Use higher speed so blocks move visibly fast (pixels per second)
@@ -99,6 +100,8 @@ int main() {
             WindowName::SetShowStr(str_WindowName, WindowUtils::GetWindowTitle(WindowUtils::GetWindowUnderCursor()));
             WindowName::DrawWindowName(MousePOS, ImGui::ColorConvertFloat4ToU32(c_show(3)), off_wnX, off_wnY);
         }
+
+        ColorPicker::DrawPickerColor({ MousePOS.x + off_cpx,MousePOS.y + off_cpy }, ColorPicker::GetColorFromPos(MousePOS),cp_showblock,cp_showRGBn, cp_bwlong,c_show(4));
 
         // Update and draw raining key overlays
         RainingKey::UpdateRainingBlocks();

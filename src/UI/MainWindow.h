@@ -37,6 +37,7 @@ private:
     #define Tab_SC_PointerLine 5
     #define Tab_SC_WindowName 6
     #define Tab_SC_RainingKey 7
+    #define Tab_SC_ColorPicker 8
 	int Tab = Tab_Home;  // 当前选中的标签页
 
     void DrawMENU();
@@ -48,4 +49,5 @@ private:
     void DrawTab_SC_PointerLineMain();
     void DrawTab_SC_WindowNameMain();
     void DrawTab_SC_RainingKeyMain();
+    void DrawTab_SC_ColorPickerMain();
 };

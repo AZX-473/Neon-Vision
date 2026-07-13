@@ -65,6 +65,9 @@ void MainWindow::Draw(ImVec2 WindowSize) {
             case Tab_SC_RainingKey:
                 DrawTab_SC_RainingKeyMain();
                 break;
+            case Tab_SC_ColorPicker:
+                DrawTab_SC_ColorPickerMain();
+                break;
             }
             ImGui::PopFont();
         }
@@ -166,6 +169,7 @@ void MainWindow::DrawTab_VisionMain() {
     if (ImGui::Button(u8"窗口名称设置", { 140.0f,0.0f })) Tab = Tab_SC_WindowName;
     if (ImGui::Button(u8"窗口边框设置", { 140.0f,0.0f })) Tab = Tab_SC_WindowRECT;
     if (ImGui::Button(u8"按键下落设置", { 140.0f,0.0f })) Tab = Tab_SC_RainingKey;
+    if (ImGui::Button(u8"取色器设置", { 140.0f,0.0f })) Tab = Tab_SC_ColorPicker;
     ImGui::PopStyleColor();
 
 	ImGui::EndChild();
@@ -255,7 +259,7 @@ void MainWindow::DrawTab_SC_RainingKeyMain() {
 
     // Controls: list all keys
     int count = RainingKey::GetKeyCount();
-    if (ImGui::Button(u8"添加按键")) {
+    if (ImGui::Button(u8"添加按键##setting")) {
         // add at default position to the right
         float baseX = 200.0f + count * 120.0f;
         RainingKey::AddKey(baseX, 200.0f, VK_A + (count % 26), 500.0f, std::string("K"));
@@ -269,9 +273,9 @@ void MainWindow::DrawTab_SC_RainingKeyMain() {
         ImGui::PushID(i);
         KeyBlock kb = RainingKey::GetKeyCopy(i);
         // Use a stable header label (without the editable text) so collapsing state isn't lost when s_key changes
-        std::string header = "Key " + std::to_string(i);
+        std::string header = kb.s_key;
         if (ImGui::CollapsingHeader(header.c_str())) {
-            ImGui::SameLine(); ImGui::TextUnformatted(kb.s_key.c_str());
+            //ImGui::SameLine(); ImGui::TextUnformatted(kb.s_key.c_str());
             bool dirty = false;
 
             // operate directly on a local copy and apply immediately when a control changes
@@ -287,26 +291,26 @@ void MainWindow::DrawTab_SC_RainingKeyMain() {
             ImVec4 rainc = ImGui::ColorConvertU32ToFloat4(kb.raining_col);
 
             // Allow dragging to change position
-            if (ImGui::DragFloat("X", &x, 1.0f, 0.0f, 10000.0f)) { kb.x = x; dirty = true; }
-            if (ImGui::DragFloat("Y", &y, 1.0f, 0.0f, 10000.0f)) { kb.y = y; dirty = true; }
-            if (ImGui::InputFloat("速度 (px/s)", &speed)) { kb.RainingSpeed = speed; dirty = true; }
-            if (ImGui::InputFloat("宽度", &width)) { kb.width = width; dirty = true; }
-            if (ImGui::InputFloat("最大长度", &maxh)) { kb.max_height = maxh; dirty = true; }
-            if (ImGui::InputFloat("生成间隔(s)", &spawn)) { kb.spawnInterval = spawn; dirty = true; }
-            if (ImGui::InputInt("VK码", &vk)) { kb.vk = vk; dirty = true; }
+            if (ImGui::DragFloat("X坐标##setting", &x, 1.0f, 0.0f, 10000.0f)) { kb.x = x; dirty = true; }
+            if (ImGui::DragFloat("Y坐标##setting", &y, 1.0f, 0.0f, 10000.0f)) { kb.y = y; dirty = true; }
+            if (ImGui::InputFloat("速度 (px/s)##setting", &speed)) { kb.RainingSpeed = speed; dirty = true; }
+            if (ImGui::InputFloat("宽度##setting", &width)) { kb.width = width; dirty = true; }
+            if (ImGui::InputFloat("最大长度##setting", &maxh)) { kb.max_height = maxh; dirty = true; }
+            if (ImGui::InputFloat("生成间隔(s)##setting", &spawn)) { kb.spawnInterval = spawn; dirty = true; }
+            if (ImGui::InputInt("VK码##setting", &vk)) { kb.vk = vk; dirty = true; }
             ImGui::SameLine();
             if (recordingIndex == i) {
-                ImGui::TextColored(ImVec4(1,0.5f,0,1), "正在录入... 按下任意键");
+                ImGui::TextColored(ImVec4(1,0.5f,0,1), "正在录入... 按下任意键##setting");
             } else {
-                if (ImGui::SmallButton("录入VK")) {
+                if (ImGui::SmallButton("录入VK##setting")) {
                     recordingIndex = i;
                 }
             }
-            if (ImGui::InputText("显示文本", label, 64)) { kb.s_key = std::string(label); dirty = true; }
+            if (ImGui::InputText("显示文本##setting", label, 64)) { kb.s_key = std::string(label); dirty = true; }
 
-            if (ImGui::ColorEdit4("背景未按下颜色", (float*)&bg)) { kb.bg_col = ImGui::ColorConvertFloat4ToU32(bg); dirty = true; }
-            if (ImGui::ColorEdit4("背景按下颜色", (float*)&bgp)) { kb.bg_col_pressed = ImGui::ColorConvertFloat4ToU32(bgp); dirty = true; }
-            if (ImGui::ColorEdit4("下落颜色", (float*)&rainc)) { kb.raining_col = ImGui::ColorConvertFloat4ToU32(rainc); dirty = true; }
+            if (ImGui::ColorEdit4("背景未按下颜色##setting", (float*)&bg)) { kb.bg_col = ImGui::ColorConvertFloat4ToU32(bg); dirty = true; }
+            if (ImGui::ColorEdit4("背景按下颜色##setting", (float*)&bgp)) { kb.bg_col_pressed = ImGui::ColorConvertFloat4ToU32(bgp); dirty = true; }
+            if (ImGui::ColorEdit4("下落颜色##setting", (float*)&rainc)) { kb.raining_col = ImGui::ColorConvertFloat4ToU32(rainc); dirty = true; }
 
             if (dirty) {
                 RainingKey::UpdateKey(i, kb);
@@ -325,12 +329,36 @@ void MainWindow::DrawTab_SC_RainingKeyMain() {
             }
 
             ImGui::SameLine();
-            if (ImGui::Button("删除")) {
+            if (ImGui::Button("删除##setting")) {
                 RainingKey::RemoveKey(i);
             }
         }
         ImGui::PopID();
     }
+
+    ImGui::EndChild();
+}
+
+void MainWindow::DrawTab_SC_ColorPickerMain() {
+    ImGui::SetCursorPos({ 160.0f,10.0f });
+    ImGui::BeginChild(u8"UI", { 470.0f,330.0f }, true);
+
+    ImGui::PushFont(g_TitleFont);
+    ImGui::TextColored(c_show(0), u8"【取色器设置】");
+    ImGui::PopFont();
+
+    ImGui::Checkbox(u8"显示颜色预览正方形", &cp_showblock);
+    ImGui::Checkbox(u8"显示RGB值", &cp_showRGBn);
+
+    if (cp_showRGBn) {
+        ImGui::Checkbox(u8"启用渐变色", &Com_Col_urbc[4]);
+        if (!Com_Col_urbc[4]) {
+            ImGui::ColorEdit4(u8"颜色", (float*)&Com_Col[4]);
+        }
+    }
+    ImGui::InputInt(u8"X偏移量(相对于鼠标)", (int*) & off_cpx);
+    ImGui::InputInt(u8"Y偏移量(相对于鼠标)", (int*)&off_cpy);
+    ImGui::InputFloat(u8"正方形边长", &cp_bwlong);
 
     ImGui::EndChild();
 }
