@@ -3,11 +3,13 @@
 #include <cstdlib>
 #include <ctime>
 #include "../PublicVariable/Variable.h"
+#include "Component/WindowTopMost.h"
 #include <time.h>
 #include "../Utils/Input.h"
 #include "../Utils/VirtualKeyCodes.h"
 #include "imgui_stdlib.h"
 #include "Component/RainingKey.h"
+#include "../Utils/AnsiToUTF8.h"
 
 MainWindow::MainWindow()
     : m_counter(0)
@@ -67,6 +69,9 @@ void MainWindow::Draw(ImVec2 WindowSize) {
                 break;
             case Tab_SC_ColorPicker:
                 DrawTab_SC_ColorPickerMain();
+                break;
+            case Tab_SC_WindowTopMost:
+                DrawTab_SC_WindowTopMostMain();
                 break;
             }
             ImGui::PopFont();
@@ -161,6 +166,12 @@ void MainWindow::DrawTab_ModeMain() {
     if (ImGui::Button((ol_ColorPicker) ? u8"启用##4" : u8"禁用##4", { 140.0f,0.0f })) ol_ColorPicker ^= 1;
     ImGui::PopStyleColor();
 
+    ImGui::PushStyleColor(ImGuiCol_Button, (ol_WindowTopMost) ? ImVec4(0.0f, 0.7f, 0.0f, 1.0f) : ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+    ImGui::Text(u8"窗口置顶");
+    ImGui::SameLine();
+    if (ImGui::Button((ol_WindowTopMost) ? u8"启用##5" : u8"禁用##5", { 140.0f,0.0f })) ol_WindowTopMost ^= 1;
+    ImGui::PopStyleColor();
+
     ImGui::EndChild();
 }
 
@@ -196,6 +207,7 @@ void MainWindow::DrawTab_VisionMain() {
     if (ol_WindowRECT) if (ImGui::Button(u8"窗口边框设置", { 140.0f,0.0f })) Tab = Tab_SC_WindowRECT;
     if (ol_RainingKey) if (ImGui::Button(u8"按键下落设置", { 140.0f,0.0f })) Tab = Tab_SC_RainingKey;
     if (ol_ColorPicker) if (ImGui::Button(u8"取色器设置", { 140.0f,0.0f })) Tab = Tab_SC_ColorPicker;
+    if (ol_WindowTopMost) if (ImGui::Button(u8"置顶窗口设置", { 140.0f,0.0f })) Tab = Tab_SC_WindowTopMost;
     ImGui::PopStyleColor();
 
 	ImGui::EndChild();
@@ -385,6 +397,34 @@ void MainWindow::DrawTab_SC_ColorPickerMain() {
     ImGui::InputInt(u8"X偏移量(相对于鼠标)", (int*) & off_cpx);
     ImGui::InputInt(u8"Y偏移量(相对于鼠标)", (int*)&off_cpy);
     ImGui::InputFloat(u8"正方形边长", &cp_bwlong);
+
+    ImGui::EndChild();
+}
+
+void MainWindow::DrawTab_SC_WindowTopMostMain() {
+    ImGui::SetCursorPos({ 160.0f,10.0f });
+    ImGui::BeginChild(u8"UI", { 470.0f,330.0f }, true);
+
+    ImGui::PushFont(g_TitleFont);
+    ImGui::TextColored(c_show(0), u8"【窗口置顶设置】");
+    ImGui::PopFont();
+
+    ImGui::Text(u8"置顶与非置顶仅适用于一般软件,对部分软件无效");
+
+    std::vector<WindowInfo> AllWindow=WindowTopMost::GetAllWindow();
+    for (WindowInfo window : AllWindow) {
+        window.title=ANSIToUTF8(window.title);
+        char idStr[32];
+        sprintf_s(idStr, sizeof(idStr), "%p", window.hwnd);
+        ImGui::PushID(idStr);
+        ImGui::PushStyleColor(ImGuiCol_Button, (window.isTopMost) ? ImVec4(0.0f, 0.7f, 0.0f, 1.0f) : ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+        ImGui::Text(window.title.c_str());
+        ImGui::SameLine();
+        if (ImGui::Button((window.isTopMost) ? u8"置顶":u8"非置顶", {140.0f,0.0f}))
+            WindowTopMost::ToggleTopMost(window.hwnd);
+        ImGui::PopStyleColor();
+        ImGui::PopID();
+    }
 
     ImGui::EndChild();
 }

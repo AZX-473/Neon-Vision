@@ -32,3 +32,5 @@ extern bool ol_RainingKey;
 extern bool cp_showblock, cp_showRGBn,ol_ColorPicker;
 extern float cp_bwlong;
 extern LONG off_cpx,off_cpy;
+
+extern bool ol_WindowTopMost;

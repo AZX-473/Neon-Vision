@@ -25,3 +25,5 @@ bool ol_RainingKey = true;
 bool cp_showblock = true, cp_showRGBn = true,ol_ColorPicker=true;
 float cp_bwlong = 20.0f;
 LONG off_cpx=5.0f,off_cpy=30.0f;
+
+bool ol_WindowTopMost = true;

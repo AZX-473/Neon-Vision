@@ -39,6 +39,10 @@ cmake --build build --config Release
 ```BASH
 .\build\Release\NeonVision.exe
 ```
+6.如果编译失败请尝试删除缓存后重新编译
+```BASH
+Remove-Item -Recurse -Force build
+```
 
 ## 安装
 ### [请跳转至releases页面下载最新的安装包](https://github.com/AZX-473/Neon-Vision/releases)
