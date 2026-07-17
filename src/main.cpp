@@ -53,7 +53,7 @@ int main() {
         return 1;
     }
 
-    win_sparkle_set_appcast_url("https://AZX-473.github.io/Neon-Vision/appcast.xml");
+    win_sparkle_set_appcast_url("https://raw.githubusercontent.com/AZX-473/Neon-Vision/master/docs/appcast.xml");
     win_sparkle_set_app_details(
         L"AZX",           // 公司名/作者
         L"NeonVision",        // 应用名
