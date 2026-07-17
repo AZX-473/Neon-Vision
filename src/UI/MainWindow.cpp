@@ -10,6 +10,7 @@
 #include "imgui_stdlib.h"
 #include "Component/RainingKey.h"
 #include "../Utils/AnsiToUTF8.h"
+#include <winsparkle.h>
 
 MainWindow::MainWindow()
     : m_counter(0)
@@ -122,7 +123,8 @@ void MainWindow::DrawTab_HomeMain() {
     memset(Time, 0, sizeof Time);
     strftime(Time, sizeof(Time), "%Y-%m-%d %H:%M:%S", localtime(&t));
     ImGui::TextColored(ImColor(200, 200, 200), u8"Hello!\nNeon Vision\nTime:%s", Time);
-
+    if (ImGui::Button(u8"检查更新"))
+        win_sparkle_check_update_with_ui();
     ImGui::EndChild();
 }
 
@@ -167,7 +169,7 @@ void MainWindow::DrawTab_ModeMain() {
     ImGui::PopStyleColor();
 
     ImGui::PushStyleColor(ImGuiCol_Button, (ol_WindowTopMost) ? ImVec4(0.0f, 0.7f, 0.0f, 1.0f) : ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-    ImGui::Text(u8"窗口置顶");
+    ImGui::Text(u8"调节窗口置顶");
     ImGui::SameLine();
     if (ImGui::Button((ol_WindowTopMost) ? u8"启用##5" : u8"禁用##5", { 140.0f,0.0f })) ol_WindowTopMost ^= 1;
     ImGui::PopStyleColor();
@@ -292,7 +294,7 @@ void MainWindow::DrawTab_SC_RainingKeyMain() {
     ImGui::BeginChild(u8"RainingKeyUI", { 470.0f,330.0f }, true);
 
     ImGui::PushFont(g_TitleFont);
-    ImGui::TextColored(c_show(0), u8"【按键下落设置】");
+    ImGui::TextColored(c_show(0), u8"【键雨设置】");
     ImGui::PopFont();
 
     // Controls: list all keys
@@ -311,7 +313,8 @@ void MainWindow::DrawTab_SC_RainingKeyMain() {
         ImGui::PushID(i);
         KeyBlock kb = RainingKey::GetKeyCopy(i);
         // Use a stable header label (without the editable text) so collapsing state isn't lost when s_key changes
-        std::string header = kb.s_key;
+        // Visible label shows index, unique ID ensures stable collapsing state even if kb.s_key changes
+        std::string header = std::string(u8"按键 ") + std::to_string(i) + std::string("##rainingkey_") + std::to_string(i);
         if (ImGui::CollapsingHeader(header.c_str())) {
             //ImGui::SameLine(); ImGui::TextUnformatted(kb.s_key.c_str());
             bool dirty = false;

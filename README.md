@@ -28,6 +28,7 @@ vcpkg install imgui:x64-windows
 vcpkg install glfw3:x64-windows
 vcpkg install opengl:x64-windows
 vcpkg install imgui[core,glfw-binding,opengl3-binding]:x64-windows
+vcpkg install winsparkle:x64-windows
 ```
 4.编译项目
 在项目根目录下执行

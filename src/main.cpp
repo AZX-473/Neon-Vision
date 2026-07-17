@@ -13,6 +13,7 @@
 #include <GLFW/glfw3native.h> 
 #include <iostream>
 #include "UI/Component/RainingKey.h"
+#include <winsparkle.h>
 
 int main() {
 
@@ -51,6 +52,14 @@ int main() {
         WindowManager::TerminateGLFW();
         return 1;
     }
+
+    win_sparkle_set_appcast_url("https://AZX-473.github.io/Neon-Vision/appcast.xml");
+    win_sparkle_set_app_details(
+        L"AZX",           // 公司名/作者
+        L"NeonVision",        // 应用名
+        L"1.0.0"              // 当前版本号（必须和你的程序版本一致）
+    );
+    win_sparkle_init();
 
     FontManager::GetInstance().InitFonts();
 

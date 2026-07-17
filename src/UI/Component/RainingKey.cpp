@@ -42,20 +42,41 @@ void RainingKey::RemoveKey(int index) {
 
 void RainingKey::UpdateRainingBlocks() {
 	if (KeyBlocks.empty()) return;
+	// dragging state for interactive repositioning of KeyBlocks
+	static int draggingIndex = -1;
+	static ImVec2 dragOffset(0, 0);
+
+	// Decide whether the overlay should accept inputs this frame.
+	// If the mouse is over any key rect or a drag is active, accept inputs; otherwise allow clicks to pass through.
+	ImVec2 mousePos = ImGui::GetIO().MousePos;
+	bool hoverAny = false;
+	for (const auto& kb : KeyBlocks) {
+		float bw = kb.width > 0.0f ? kb.width : 100.0f;
+		float bh = 30.0f;
+		ImVec2 kb0(kb.x - bw / 2.0f, kb.y - bh / 2.0f);
+		ImVec2 kb1(kb.x + bw / 2.0f, kb.y + bh / 2.0f);
+		if (mousePos.x >= kb0.x && mousePos.x <= kb1.x && mousePos.y >= kb0.y && mousePos.y <= kb1.y) {
+			hoverAny = true;
+			break;
+		}
+	}
+
+	bool wantsInput = hoverAny || (draggingIndex != -1);
 
 	// Prepare an invisible overlay window for drawing
 	ImGui::SetNextWindowBgAlpha(0.0f);
 	ImGui::SetNextWindowPos(ImVec2(0, 0));
 	ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
 
+	// Allow inputs only if needed so underlying main window can receive clicks when not interacting with keys
 	ImGuiWindowFlags OverlayWindowflags =
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoScrollbar |
-		ImGuiWindowFlags_NoInputs |
 		ImGuiWindowFlags_NoBackground |
 		ImGuiWindowFlags_NoNavFocus;
+	if (!wantsInput) OverlayWindowflags |= ImGuiWindowFlags_NoInputs;
 
 	ImGui::Begin("RainingKeyOverlay", nullptr, OverlayWindowflags);
 
@@ -79,6 +100,29 @@ void RainingKey::UpdateRainingBlocks() {
 		draw_list->AddRect(kb0, kb1, IM_COL32(0, 0, 0, 200), 6.0f, 0, 1.0f);
 		ImVec2 text_size = ImGui::CalcTextSize(kb.s_key.c_str());
 		draw_list->AddText(ImVec2(kb.x - text_size.x / 2.0f, kb.y - text_size.y / 2.0f), IM_COL32(255, 255, 255, 255), kb.s_key.c_str());
+
+		// Mouse interaction: start dragging when left mouse pressed inside key rect
+		ImVec2 mousePos = ImGui::GetIO().MousePos;
+		bool hover = ImGui::IsMouseHoveringRect(kb0, kb1, true);
+		if (draggingIndex == -1) {
+			if (hover && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+				draggingIndex = (int)i;
+				dragOffset = ImVec2(mousePos.x - kb.x, mousePos.y - kb.y);
+			}
+		}
+		// while dragging this key, update its position to follow the mouse
+		if (draggingIndex == (int)i) {
+			if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+				kb.x = mousePos.x - dragOffset.x;
+				kb.y = mousePos.y - dragOffset.y;
+				// apply immediate update so editor shows updated values
+				RainingKey::UpdateKey((int)i, kb);
+			}
+			else {
+				// mouse released
+				draggingIndex = -1;
+			}
+		}
 
 		bool isPressed = KEY_DOWN(kb.vk);
 
