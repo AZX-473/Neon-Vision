@@ -6,6 +6,7 @@
 #include "Component/WindowTopMost.h"
 #include <time.h>
 #include "../Utils/Input.h"
+#include "../Utils/WindowUtils.h"
 #include "../Utils/VirtualKeyCodes.h"
 #include "imgui_stdlib.h"
 #include "Component/RainingKey.h"
@@ -38,7 +39,15 @@ void MainWindow::Draw(ImVec2 WindowSize) {
         ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoMove |*/
         ImGuiWindowFlags_NoResize ;
-    if (MainWindowShow || KEY_DOWN(VK_RCONTROL)) {
+    // Toggle main UI on edge (press) of Right Control key
+    static bool prevRControlDown = false;
+    bool curRControlDown = KEY_DOWN(VK_RCONTROL);
+    if (curRControlDown && !prevRControlDown) {
+        MainWindowShow = !MainWindowShow;
+    }
+    prevRControlDown = curRControlDown;
+
+    if (MainWindowShow) {
         if (ImGui::Begin("NeonVision Main", nullptr, window_flags)) {
             ImGui::PushFont(g_MainFont);
 
@@ -136,8 +145,6 @@ void MainWindow::DrawTab_ModeMain() {
     ImGui::TextColored(c_show(0), u8"【功能】");
     ImGui::PopFont();
 
-    ImGui::Checkbox(u8"锁定窗口", &MainWindowShow);
-
     ImGui::PushStyleColor(ImGuiCol_Button, (ol_PointerLine) ? ImVec4(0.0f, 0.7f, 0.0f, 1.0f) : ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
     ImGui::Text(u8"鼠标定位线");
     ImGui::SameLine();
@@ -186,7 +193,25 @@ void MainWindow::DrawTab_SurveillanceMain() {
     ImGui::PopFont();
 
     ImGui::TextColored(ImColor(200, 200, 200), u8"FPS: %.1f", ImGui::GetIO().Framerate);
+    // Mouse position
+    POINT p; GetCursorPos(&p);
+    ImGui::Text(u8"鼠标位置: %d, %d", p.x, p.y);
 
+    // Window under mouse
+    HWND hw = WindowUtils::GetWindowUnderCursor();
+    std::string wtitle = hw ? WindowUtils::GetWindowTitle(hw) : std::string("(无)");
+    RECT wr = hw ? WindowUtils::GetWindowRect(hw) : RECT{0,0,0,0};
+    ImGui::Text(u8"鼠标所在窗口: %s", wtitle.c_str());
+    ImGui::Text(u8"窗口位置: x=%d y=%d", wr.left, wr.top);
+    ImGui::Text(u8"窗口大小: w=%d h=%d", wr.right - wr.left, wr.bottom - wr.top);
+
+    // 额外常用信息：客户区、进程ID、类名
+    int cw = 0, ch = 0; if (hw) WindowUtils::GetClientSize(hw, cw, ch);
+    ImGui::Text(u8"客户区: %d x %d", cw, ch);
+    DWORD pid = hw ? WindowUtils::GetWindowProcessId(hw) : 0;
+    ImGui::Text(u8"进程ID: %u", pid);
+    std::string cls = hw ? WindowUtils::GetWindowClassName(hw) : std::string();
+    ImGui::Text(u8"类名: %s", cls.c_str());
     ImGui::EndChild();
 }
 
