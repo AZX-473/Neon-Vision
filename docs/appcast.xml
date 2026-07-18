@@ -5,9 +5,9 @@
 		<description>NeonVision 应用自动更新通道</description>
 		<language>zh-cn</language>
 		<item>
-			<title>版本 1.1.0</title>
+			<title>版本 1.2.0</title>
 			<!-- 【每次发新版都要改这里】 -->
-			<sparkle:version>1.1.0</sparkle:version>
+			<sparkle:version>1.2.0</sparkle:version>
 			<pubDate>Fri, 18 Jul 2026 10:00:00 +0800</pubDate>
 			<enclosure url="https://github.com/AZX-473/Neon-Vision/releases/latest/download/NeonVision-Setup.exe"
                        sparkle:os="windows"

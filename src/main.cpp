@@ -58,7 +58,7 @@ int main() {
     win_sparkle_set_app_details(
         L"AZX",           // 公司名/作者
         L"NeonVision",        // 应用名
-        L"1.1.0"              // 当前版本号（必须和你的程序版本一致）
+        L"1.2.0"              // 当前版本号（必须和你的程序版本一致）
     );
     win_sparkle_set_automatic_check_for_updates(TRUE);
     win_sparkle_set_update_check_interval(86400);
