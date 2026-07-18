@@ -125,10 +125,12 @@ void RainingKey::UpdateRainingBlocks() {
 		}
 
 		bool isPressed = KEY_DOWN(kb.vk);
+		// remember whether key was pressed in previous frame (kb.lastPressed stores that)
+		bool prevPressed = kb.lastPressed;
 
 		// On press: spawn new block if this is a new press; if continuing press, extend last block to connect
 		if (isPressed) {
-			if (!kb.lastPressed || blocks.empty()) {
+			if (!prevPressed || blocks.empty()) {
 				// spawn a new block segment
 				RainingBlock nb;
 				nb.active = true;
@@ -159,23 +161,48 @@ void RainingKey::UpdateRainingBlocks() {
 		for (auto& b : blocks) {
 			if (!b.active) continue;
 
+			// compute clip top (upper limit)
+			float clipTop = kb.y - kb.max_height;
+			// compute key top Y (button top edge)
+			float bh = 30.0f;
+			float keyTopY = kb.y - bh / 2.0f;
+			// move top by speed and clamp to clipTop (do not pass the upper limit)
+			float newTop = b.topY - move;
+			if (newTop < clipTop) newTop = clipTop;
+			b.topY = newTop;
+
+			// determine if bottom was recently anchored to key top (within eps) or at base
+			const float eps = 1.5f;
+			bool bottomAnchoredPrev = (fabs(b.bottomY - keyTopY) <= eps) || (fabs(b.bottomY - kb.y) <= eps);
+
 			if (b.shrinking) {
 				// shrinking: top moves up, bottom moves up faster to reduce length
-				b.topY -= move;
+				b.topY -= move; // continue removing length
 				b.bottomY -= move * (1.0f + shrinkMultiplier);
 			}
 			else if (b.fixed) {
 				// fixed while key held: keep anchored to base (no movement)
-				if (!kb.lastPressed) {
+				if (kb.lastPressed) {
+					// if bottom was previously anchored or equal to base, keep it at key top to avoid overlap
+					if (prevPressed && bottomAnchoredPrev) b.bottomY = keyTopY;
+					// otherwise keep as-is while fixed
+				}
+				else {
 					// key released: start shrinking
 					b.fixed = false;
 					b.shrinking = true;
 				}
 			}
 			else {
-				// normal moving block
-				b.topY -= move;
-				b.bottomY -= move;
+				// normal moving block: move bottom up unless we should anchor it
+				if (prevPressed && bottomAnchoredPrev) {
+					// anchor bottom to key top
+					b.bottomY = keyTopY;
+					if (b.topY > b.bottomY) b.topY = b.bottomY;
+				}
+				else {
+					b.bottomY -= move;
+				}
 			}
 		}
 
