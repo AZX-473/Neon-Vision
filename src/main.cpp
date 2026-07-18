@@ -19,6 +19,7 @@ int main() {
 
     FontManager::GetInstance().RegisterFont(g_MainFont, "msyh", 16.0f);
     FontManager::GetInstance().RegisterFont(g_TitleFont, "msyh", 24.0f);
+    FontManager::GetInstance().RegisterFont(g_SmallFont, "msyh", 8.0f);
 
     // Initialize GLFW
     if (!WindowManager::InitGLFW()) {
@@ -57,8 +58,10 @@ int main() {
     win_sparkle_set_app_details(
         L"AZX",           // 公司名/作者
         L"NeonVision",        // 应用名
-        L"1.0.1"              // 当前版本号（必须和你的程序版本一致）
+        L"1.1.0"              // 当前版本号（必须和你的程序版本一致）
     );
+    win_sparkle_set_automatic_check_for_updates(TRUE);
+    win_sparkle_set_update_check_interval(86400);
     win_sparkle_init();
 
     FontManager::GetInstance().InitFonts();

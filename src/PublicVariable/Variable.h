@@ -6,6 +6,7 @@
 // Declare global ImGui fonts. Define them in a single .cpp to avoid multiple-definition linker errors.
 extern ImFont* g_MainFont;
 extern ImFont* g_TitleFont;
+extern ImFont* g_SmallFont;
 
 extern HWND hWnd; // Main Window hWnd
 

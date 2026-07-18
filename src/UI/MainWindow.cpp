@@ -12,6 +12,8 @@
 #include "Component/RainingKey.h"
 #include "../Utils/AnsiToUTF8.h"
 #include <winsparkle.h>
+#include "../Utils/ImGuiImage.h"
+#include "../Utils/ImGuiAudio.h"
 
 MainWindow::MainWindow()
     : m_counter(0)
@@ -132,8 +134,10 @@ void MainWindow::DrawTab_HomeMain() {
     memset(Time, 0, sizeof Time);
     strftime(Time, sizeof(Time), "%Y-%m-%d %H:%M:%S", localtime(&t));
     ImGui::TextColored(ImColor(200, 200, 200), u8"Hello!\nNeon Vision\nTime:%s", Time);
-    if (ImGui::Button(u8"检查更新"))
-        win_sparkle_check_update_with_ui();
+    ShowImage("icon.png",true,0.1);
+    ImGui::PushFont(g_SmallFont);
+    ImGui::TextColored(ImColor(200, 200, 200), u8"©WanFoxAZX");
+    ImGui::PopFont();
     ImGui::EndChild();
 }
 
@@ -212,6 +216,13 @@ void MainWindow::DrawTab_SurveillanceMain() {
     ImGui::Text(u8"进程ID: %u", pid);
     std::string cls = hw ? WindowUtils::GetWindowClassName(hw) : std::string();
     ImGui::Text(u8"类名: %s", cls.c_str());
+
+    ImGui::PushStyleColor(ImGuiCol_Button, (IsAudioPlaying()) ? ImVec4(0.0f, 0.7f, 0.0f, 1.0f) : ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+    if (ImGui::Button(u8"测试扬声器")) {
+        if (IsAudioPlaying()) StopMP3();
+        else PlayMP3("The_Big_Black.mp3");
+    }
+    ImGui::PopStyleColor();
     ImGui::EndChild();
 }
 
@@ -232,7 +243,7 @@ void MainWindow::DrawTab_VisionMain() {
     if (ol_PointerLine) if (ImGui::Button(u8"定位线设置", { 140.0f,0.0f })) Tab = Tab_SC_PointerLine;
     if (ol_WindowName) if (ImGui::Button(u8"窗口名称设置", { 140.0f,0.0f })) Tab = Tab_SC_WindowName;
     if (ol_WindowRECT) if (ImGui::Button(u8"窗口边框设置", { 140.0f,0.0f })) Tab = Tab_SC_WindowRECT;
-    if (ol_RainingKey) if (ImGui::Button(u8"按键下落设置", { 140.0f,0.0f })) Tab = Tab_SC_RainingKey;
+    if (ol_RainingKey) if (ImGui::Button(u8"键雨设置", { 140.0f,0.0f })) Tab = Tab_SC_RainingKey;
     if (ol_ColorPicker) if (ImGui::Button(u8"取色器设置", { 140.0f,0.0f })) Tab = Tab_SC_ColorPicker;
     if (ol_WindowTopMost) if (ImGui::Button(u8"置顶窗口设置", { 140.0f,0.0f })) Tab = Tab_SC_WindowTopMost;
     ImGui::PopStyleColor();

@@ -1,5 +1,17 @@
 ﻿cmake_minimum_required(VERSION 3.16)
-project(NeonVision VERSION 1.0.0 LANGUAGES CXX)
+
+# ============================================================
+# 【使用环境变量 VCPKG_ROOT，不硬编码任何路径】
+# ============================================================
+if(DEFINED ENV{VCPKG_ROOT})
+    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" 
+        CACHE STRING "" FORCE)
+endif()
+
+project(NeonVision VERSION 1.1.0 LANGUAGES CXX)
+
+# 导出编译命令
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # ============================================================
 # 1. C++ 标准
@@ -23,14 +35,13 @@ elseif(UNIX)
 endif()
 
 # ============================================================
-# 3. 查找依赖（通过 vcpkg 工具链提供路径）
+# 3. 查找依赖
 # ============================================================
 find_package(OpenGL REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 
-# WinSparkle 没有提供 CMake 配置文件，需要用 FindWinSparkle.cmake
-# 或者使用 find_path/find_library 配合 vcpkg 的变量
+# WinSparkle
 find_path(WINSPARKLE_INCLUDE_DIR
     NAMES winsparkle.h
     PATH_SUFFIXES winsparkle
@@ -118,9 +129,12 @@ endif()
 # ============================================================
 # 11. 最终信息
 # ============================================================
+message(STATUS "========================================")
 message(STATUS "Project: ${PROJECT_NAME} v${PROJECT_VERSION}")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "C++ Standard: ${CMAKE_CXX_STANDARD}")
+message(STATUS "VCPKG_ROOT: $ENV{VCPKG_ROOT}")
 if(WINSPARKLE_INCLUDE_DIR)
     message(STATUS "WinSparkle: ${WINSPARKLE_INCLUDE_DIR}")
 endif()
+message(STATUS "========================================")

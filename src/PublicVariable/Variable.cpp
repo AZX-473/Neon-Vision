@@ -3,6 +3,7 @@
 // Define global ImGui fonts in one translation unit.
 ImFont* g_MainFont = nullptr;
 ImFont* g_TitleFont = nullptr;
+ImFont* g_SmallFont = nullptr;
 
 HWND hWnd = nullptr; // Main Window hWnd
 
