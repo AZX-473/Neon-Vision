@@ -19,7 +19,10 @@ git clone https://github.com/microsoft/vcpkg
 cd vcpkg
 ./bootstrap-vcpkg.bat
 ```
-2.配置vcpkg环境变量
+2.配置vcpkg环境变量(这行命令仅临时有效,请根据你的需要设置用户变量和环境变量)
+```BASH
+$env:VCPKG_ROOT = "你的vcpkg路径"
+```
 
 
 3.安装依赖库
@@ -29,6 +32,8 @@ vcpkg install glfw3:x64-windows
 vcpkg install opengl:x64-windows
 vcpkg install imgui[core,glfw-binding,opengl3-binding]:x64-windows
 vcpkg install winsparkle:x64-windows
+vcpkg install cpp-httplib:x64-windows
+vcpkg install nlohmann-json:x64-windows
 ```
 4.编译项目
 在项目根目录下执行
@@ -42,7 +47,7 @@ cmake --build build --config Release
 ```
 6.如果编译失败请尝试删除缓存后重新编译
 ```BASH
-Remove-Item -Recurse -Force build
+Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue
 ```
 
 ## 安装

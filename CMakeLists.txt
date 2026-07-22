@@ -3,15 +3,25 @@
 # ============================================================
 # 【使用环境变量 VCPKG_ROOT，不硬编码任何路径】
 # ============================================================
+# 检查环境变量
 if(DEFINED ENV{VCPKG_ROOT})
-    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" 
-        CACHE STRING "" FORCE)
+    set(VCPKG_ROOT "$ENV{VCPKG_ROOT}")
+else()
+    # 如果环境变量未设置，报错并提示
+    message(FATAL_ERROR "❌ VCPKG_ROOT environment variable not set! Please set it to your vcpkg installation path.")
 endif()
+
+# 打印确认信息
+message(STATUS "✅ VCPKG_ROOT: ${VCPKG_ROOT}")
+
+# 设置工具链
+set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" 
+    CACHE STRING "" FORCE)
 
 project(NeonVision VERSION 1.1.0 LANGUAGES CXX)
 
 # 导出编译命令
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "" FORCE)
 
 # ============================================================
 # 1. C++ 标准
@@ -47,6 +57,12 @@ find_path(WINSPARKLE_INCLUDE_DIR
     PATH_SUFFIXES winsparkle
 )
 
+find_path(CPP_HTTPLIB_INCLUDE_DIR
+    NAMES httplib.h
+    PATHS ${VCPKG_ROOT}/installed/x64-windows/include
+    REQUIRED
+)
+
 find_library(WINSPARKLE_LIBRARY
     NAMES WinSparkle
 )
@@ -74,13 +90,14 @@ endif()
 # ============================================================
 # 6. 包含目录
 # ============================================================
+
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     $<TARGET_PROPERTY:imgui::imgui,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
 if(WINSPARKLE_INCLUDE_DIR)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${WINSPARKLE_INCLUDE_DIR})
+    target_include_directories(${PROJECT_NAME} PRIVATE ${WINSPARKLE_INCLUDE_DIR} ${CPP_HTTPLIB_INCLUDE_DIR})
 endif()
 
 # ============================================================

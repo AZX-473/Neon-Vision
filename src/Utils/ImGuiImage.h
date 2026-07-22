@@ -55,8 +55,7 @@ TextureInfo LoadTextureFromFile(const char* filename) {
 // ============================================================
 std::unordered_map<std::string, TextureInfo> g_TextureCache;
 
-void ShowImage(const std::string& file, bool keepOriginalSize = true, float m=1,ImVec2 size = ImVec2(0.0f, 0.0f)) {
-    // 从缓存查找
+void ShowImage(const std::string& file, bool keepOriginalSize = true, float m = 1.0f, ImVec2 size = ImVec2(0.0f, 0.0f)) {
     auto it = g_TextureCache.find(file);
     if (it == g_TextureCache.end()) {
         TextureInfo tex = LoadTextureFromFile((std::string("resources/") + file).c_str());
@@ -69,13 +68,53 @@ void ShowImage(const std::string& file, bool keepOriginalSize = true, float m=1,
 
     ImVec2 displaySize;
     if (keepOriginalSize) {
-        displaySize = ImVec2((float)tex.width*m, (float)tex.height*m);
+        displaySize = ImVec2((float)tex.width * m, (float)tex.height * m);
     }
     else {
         displaySize = size;
     }
 
     ImGui::Image((ImTextureID)(intptr_t)tex.id, displaySize);
+}
+
+// ============================================================
+// 清空指定图片的缓存
+// ============================================================
+void ClearImageCache(const std::string& file) {
+    auto it = g_TextureCache.find(file);
+    if (it != g_TextureCache.end()) {
+        if (it->second.id != 0) {
+            glDeleteTextures(1, &it->second.id);
+        }
+        g_TextureCache.erase(it);
+    }
+}
+
+// ============================================================
+// 清空所有图片缓存
+// ============================================================
+void ClearAllImageCache() {
+    for (auto& pair : g_TextureCache) {
+        if (pair.second.id != 0) {
+            glDeleteTextures(1, &pair.second.id);
+        }
+    }
+    g_TextureCache.clear();
+}
+
+// ============================================================
+// 重新加载指定图片（清空缓存后重新加载）
+// ============================================================
+void ReloadImage(const std::string& file, bool keepOriginalSize = true, float m = 1.0f, ImVec2 size = ImVec2(0.0f, 0.0f)) {
+    ClearImageCache(file);
+    ShowImage(file, keepOriginalSize, m, size);
+}
+
+// ============================================================
+// 重新加载所有图片
+// ============================================================
+void ReloadAllImages() {
+    ClearAllImageCache();
 }
 
 // ============================================================

@@ -14,6 +14,18 @@
 #include <winsparkle.h>
 #include "../Utils/ImGuiImage.h"
 #include "../Utils/ImGuiAudio.h"
+#include "../Utils/http.h"
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+
+std::string GetExeDirectory() {
+    char buffer[MAX_PATH];
+    GetModuleFileNameA(NULL, buffer, MAX_PATH);
+    std::string exePath(buffer);
+    size_t pos = exePath.find_last_of("\\/");
+    return exePath.substr(0, pos + 1);
+}
 
 MainWindow::MainWindow()
     : m_counter(0)
@@ -138,6 +150,48 @@ void MainWindow::DrawTab_HomeMain() {
     ImGui::PushFont(g_SmallFont);
     ImGui::TextColored(ImColor(200, 200, 200), u8"©WanFoxAZX");
     ImGui::PopFont();
+
+    /*static std::string image = "", url = "";
+    static bool isDownloading = false;      // 是否正在下载
+    static bool isWaitingForImage = false;  // 是否等待图片加载
+
+    auto& dm = DownloadManager::GetInstance();
+    std::string exeDir = GetExeDirectory();
+    std::string savePath = exeDir + "resources/image.webp";
+
+    // 【关键】只在按钮点击时设置回调，避免每帧重复设置
+    if (ImGui::Button(u8"fresh") && !isDownloading) {
+        image = httpget("api.lolicon.app/setu/v2");
+        json data = json::parse(image);
+        url = data["data"][0]["urls"]["original"];
+
+        // 设置完成回调（只设置一次）
+        dm.SetOnAllFinished([&]() {
+            ReloadImage("image.webp", true, 0.4);
+            isDownloading = false;
+            isWaitingForImage = false;
+            url = "✅ 图片已更新！";
+            });
+
+        dm.AddTask(url, savePath, "下载图片");
+        dm.StartAll();
+        isDownloading = true;
+        isWaitingForImage = true;
+    }
+
+    // 显示进度（只有下载时才绘制）
+    if (isDownloading) {
+        dm.DrawAllProgress(400.0f);
+    }
+
+    // 显示图片（只在非下载状态或完成后显示）
+    if (!isWaitingForImage || !isDownloading) {
+        ShowImage("image.webp", true, 0.1);
+    }
+    
+    测试图片下载和API调用时期的产物，懒得删了，如果有相关需要可以复制
+    */
+
     ImGui::EndChild();
 }
 
@@ -206,8 +260,8 @@ void MainWindow::DrawTab_SurveillanceMain() {
     std::string wtitle = hw ? WindowUtils::GetWindowTitle(hw) : std::string("(无)");
     RECT wr = hw ? WindowUtils::GetWindowRect(hw) : RECT{0,0,0,0};
     ImGui::Text(u8"鼠标所在窗口: %s", wtitle.c_str());
-    ImGui::Text(u8"窗口位置: x=%d y=%d", wr.left, wr.top);
-    ImGui::Text(u8"窗口大小: w=%d h=%d", wr.right - wr.left, wr.bottom - wr.top);
+    ImGui::Text(u8"窗口位置: %d , %d", wr.left, wr.top);
+    ImGui::Text(u8"窗口大小: %d , %d", wr.right - wr.left, wr.bottom - wr.top);
 
     // 额外常用信息：客户区、进程ID、类名
     int cw = 0, ch = 0; if (hw) WindowUtils::GetClientSize(hw, cw, ch);
@@ -217,12 +271,31 @@ void MainWindow::DrawTab_SurveillanceMain() {
     std::string cls = hw ? WindowUtils::GetWindowClassName(hw) : std::string();
     ImGui::Text(u8"类名: %s", cls.c_str());
 
-    ImGui::PushStyleColor(ImGuiCol_Button, (IsAudioPlaying()) ? ImVec4(0.0f, 0.7f, 0.0f, 1.0f) : ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+    /*ImGui::PushStyleColor(ImGuiCol_Button, (IsAudioPlaying()) ? ImVec4(0.0f, 0.7f, 0.0f, 1.0f) : ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
     if (ImGui::Button(u8"测试扬声器")) {
         if (IsAudioPlaying()) StopMP3();
         else PlayMP3("The_Big_Black.mp3");
     }
-    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();*/
+
+    static std::string weatherInfo = "点击刷新获取天气";
+    static json ipdata = json::parse(httpget("openapi.lddgo.net/base/gtool/api/v1/GetIp"));
+    static std::string ip = ipdata["data"]["ip"];//不知道从哪搞来的神秘小API，补药告我口牙
+    static json citydata = json::parse(httpget("api.toolshu.com/api/ip/"+ip));
+    static std::string city = citydata["city"];
+
+    ImGui::Text("你的城市(由您的IP得到,可能不准确):%s", city.c_str());
+    ImGui::Text("你的IP:%s", ip.c_str());
+
+    if (ImGui::Button(u8"获取天气")) {
+        std::string url = "wttr.in/" + city + "?format=%C+%t";
+        std::string response = httpget("wttr.in/" + city + "?format=%C+%t");
+        weatherInfo = "Weather: " + response;
+    }
+    ImGui::SameLine();
+
+    ImGui::Text("%s", weatherInfo.c_str());
+
     ImGui::EndChild();
 }
 
