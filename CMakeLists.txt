@@ -18,7 +18,7 @@ message(STATUS "✅ VCPKG_ROOT: ${VCPKG_ROOT}")
 set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" 
     CACHE STRING "" FORCE)
 
-project(NeonVision VERSION 1.1.0 LANGUAGES CXX)
+project(NeonVision VERSION 1.3.0 LANGUAGES CXX)
 
 # 导出编译命令
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "" FORCE)
